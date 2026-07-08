@@ -24,6 +24,13 @@ Do not upload `.env`.
 - Start command: `npm start`
 - Health check: `/api/health`
 
+## Vercel
+
+- Framework preset: Other
+- Build command: `npm run check`
+- Output directory: `public`
+- Add the required environment variables in Project Settings.
+
 ## Local check
 
 ```bash
