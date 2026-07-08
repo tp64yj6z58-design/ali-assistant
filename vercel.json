@@ -2,9 +2,18 @@
   "version": 2,
   "buildCommand": "npm run check",
   "outputDirectory": "public",
-  "functions": {
-    "api/*.js": {
-      "maxDuration": 30
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/api/recommend",
+      "destination": "/api/recommend"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  }
+  ]
 }
