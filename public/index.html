@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ali Assistant</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="workspace">
+        <div class="panel intro">
+          <p class="eyebrow">AliExpress Affiliate Assistant</p>
+          <h1>עוזר מוצרים חכם</h1>
+          <p class="summary">כתבו מה הלקוח מחפש, והמערכת תחזיר את 3 המוצרים הכי משתלמים לפי מחיר, ביקורות, הזמנות ונתוני מוצר.</p>
+          <div id="status" class="status">בודק חיבור...</div>
+        </div>
+
+        <div class="panel search">
+          <form id="searchForm">
+            <label for="query">מה הלקוח מחפש?</label>
+            <div class="searchRow">
+              <input id="query" name="query" autocomplete="off" placeholder="לדוגמה: מטען מהיר לרכב עם USB-C" required>
+              <button type="submit">חפש</button>
+            </div>
+          </form>
+        </div>
+
+        <section id="results" class="results" aria-live="polite"></section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

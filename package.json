@@ -1,0 +1,17 @@
+{
+  "name": "ali-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI product assistant for finding the best AliExpress affiliate products.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "check": "node src/check.js",
+    "quality": "node src/searchQuality.js",
+    "probe": "node src/searchProbe.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
