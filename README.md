@@ -35,3 +35,5 @@ npm run quality
 ## Deploy
 
 See `DEPLOYMENT.md`.
+
+Deployment trigger: Vercel should deploy every push to `main`.
