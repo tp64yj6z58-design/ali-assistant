@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run check",
   "outputDirectory": "public",
   "rewrites": [
     {
