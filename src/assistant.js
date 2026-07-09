@@ -31,30 +31,33 @@ async function recommendProducts(userInput) {
   const keywords = profile.keywords;
   const attempts = buildSearchAttempts(profile);
   const preferences = inferPreferences(query);
+  const language = detectLanguage(query);
   const source = hasAliExpressCredentials() ? "aliexpress" : "demo";
 
   const rawProducts = source === "aliexpress"
-    ? await searchAliExpressAttempts(attempts)
+    ? await searchAliExpressAttempts(attempts, language)
     : searchMockProducts(keywords);
 
-  const products = pickTopProducts(rawProducts, preferences, profile);
+  const products = pickTopProducts(rawProducts, preferences, profile, language);
 
   return {
     query,
     keywords,
     attempts,
+    language,
     source,
     products,
-    message: buildHebrewMessage(query, products, source)
+    message: buildMessage(query, products, source, language)
   };
 }
 
-async function searchAliExpressAttempts(attempts) {
+async function searchAliExpressAttempts(attempts, language = "he") {
   const allProducts = [];
   const seen = new Set();
+  const targetLanguage = language === "he" ? "HE" : "EN";
 
   for (const attempt of attempts) {
-    const products = await searchAliExpressProducts(attempt);
+    const products = await searchAliExpressProducts(attempt, { targetLanguage });
     for (const product of products) {
       const key = String(product.product_id || product.itemId || product.id || product.product_title || product.title || "");
       if (key && seen.has(key)) continue;
@@ -64,6 +67,32 @@ async function searchAliExpressAttempts(attempts) {
   }
 
   return allProducts;
+}
+
+function detectLanguage(input) {
+  return /[\u0590-\u05ff]/.test(String(input || "")) ? "he" : "en";
+}
+
+function buildMessage(query, products, source, language = "he") {
+  if (language === "en") return buildEnglishMessage(query, products, source);
+  return buildHebrewMessage(query, products, source);
+}
+
+function buildEnglishMessage(query, products, source) {
+  if (!products.length) {
+    return `I could not find strong enough products for "${query}". Try a more specific search.`;
+  }
+
+  const intro = source === "demo"
+    ? "Demo mode is active until real AliExpress keys are connected."
+    : `Found ${products.length} strong ${products.length === 1 ? "option" : "options"} based on the available data.`;
+
+  const lines = products.map((product, index) => {
+    const price = product.price ? `Price: ${product.price} ${product.currency}`.trim() : "Price: unavailable";
+    return `${index + 1}. ${product.title}\n${price}\nWhy: ${product.reasons.join(", ")}\nLink: ${product.productUrl}`;
+  });
+
+  return `${intro}\n\n${lines.join("\n\n")}`;
 }
 
 function buildHebrewMessage(query, products, source) {
@@ -83,4 +112,4 @@ function buildHebrewMessage(query, products, source) {
   return `${intro}\n\n${lines.join("\n\n")}`;
 }
 
-module.exports = { recommendProducts, buildHebrewMessage, searchAliExpressAttempts };
+module.exports = { recommendProducts, buildHebrewMessage, buildEnglishMessage, detectLanguage, searchAliExpressAttempts };

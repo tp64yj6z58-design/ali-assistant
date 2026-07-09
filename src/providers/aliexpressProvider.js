@@ -36,7 +36,7 @@ function unwrapProducts(payload) {
   return Array.isArray(products) ? products : [products].filter(Boolean);
 }
 
-async function searchAliExpressProducts(keywords) {
+async function searchAliExpressProducts(keywords, options = {}) {
   const ali = config.aliExpress;
   const params = {
     app_key: ali.appKey,
@@ -49,7 +49,7 @@ async function searchAliExpressProducts(keywords) {
     tracking_id: ali.trackingId,
     ship_to_country: ali.shipTo,
     target_currency: ali.targetCurrency,
-    target_language: ali.targetLanguage,
+    target_language: options.targetLanguage || ali.targetLanguage,
     page_no: "1",
     page_size: "50",
     sort: "LAST_VOLUME_DESC"

@@ -29,8 +29,11 @@ function renderProducts(data) {
 
   results.innerHTML = data.products.map((product, index) => `
     <article class="product">
-      <div class="rank">${index + 1}</div>
-      <h2>${escapeHtml(product.title)}</h2>
+      <div class="productImageWrap">
+        <img class="productImage" src="${escapeAttribute(product.imageUrl)}" alt="${escapeAttribute(product.title)}" loading="lazy">
+        <div class="rank">${index + 1}</div>
+      </div>
+      <h2 dir="auto">${escapeHtml(product.title)}</h2>
       <div class="meta">
         <span class="pill">${escapeHtml(money(product))}</span>
         <span class="pill">ציון ${product.score}</span>

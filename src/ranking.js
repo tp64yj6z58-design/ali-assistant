@@ -44,9 +44,11 @@ function relevanceScore(product, profile = {}) {
   const title = product.title.toLowerCase();
   const requiredTerms = profile.requiredTerms || [];
   const excludedTerms = profile.excludedTerms || [];
+  const titleIsHebrew = /[\u0590-\u05ff]/.test(title);
 
   if (excludedTerms.some((term) => termAppears(title, term))) return -25;
   if (!requiredTerms.length) return 0;
+  if (titleIsHebrew && requiredTerms.every((term) => /^[a-z0-9 -]+$/i.test(term))) return 8;
 
   const matched = requiredTerms.filter((term) => termAppears(title, term)).length;
   const ratio = matched / requiredTerms.length;
@@ -71,7 +73,17 @@ function scoreProduct(product, preferences = {}) {
   return Math.round(ratingScore + ordersScore + discountScore + priceScore + dataScore + preferenceBoost);
 }
 
-function explainChoice(product) {
+function explainChoice(product, language = "he") {
+  if (language === "en") {
+    const reasons = [];
+    if (product.rating) reasons.push(`Rating ${product.rating}/5`);
+    if (product.orders) reasons.push(`${product.orders.toLocaleString("en-US")} orders`);
+    if (product.discount) reasons.push(`${product.discount}% discount`);
+    if (product.price) reasons.push(`Price ${product.price} ${product.currency}`.trim());
+    if (!reasons.length) reasons.push("Product data available for a first comparison");
+    return reasons.slice(0, 4);
+  }
+
   const reasons = [];
   if (product.rating) reasons.push(`דירוג ${product.rating}/5`);
   if (product.orders) reasons.push(`${product.orders.toLocaleString("he-IL")} הזמנות`);
@@ -97,16 +109,16 @@ function uniqueRankedProducts(products) {
   return unique;
 }
 
-function pickTopProducts(rawProducts, preferences, profile = {}) {
+function pickTopProducts(rawProducts, preferences, profile = {}, language = "he") {
   const requiresRelevantMatch = Boolean(profile.requiredTerms && profile.requiredTerms.length);
 
   const ranked = normalizeProducts(rawProducts)
-    .filter((product) => product.title && product.productUrl)
+    .filter((product) => product.title && product.productUrl && product.imageUrl)
     .map((product) => ({
       ...product,
       relevance: relevanceScore(product, profile),
       score: scoreProduct(product, preferences) + relevanceScore(product, profile),
-      reasons: explainChoice(product)
+      reasons: explainChoice(product, language)
     }))
     .filter((product) => requiresRelevantMatch ? product.relevance > 0 : product.relevance > -18)
     .sort((a, b) => b.score - a.score);

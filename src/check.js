@@ -8,9 +8,9 @@ assert.match(keywords, /charger/);
 assert.match(keywords, /car/);
 
 const ranked = pickTopProducts([
-  { product_title: "Weak", promotion_link: "https://example.com/1", target_sale_price: "10", evaluate_rate: "3.8", lastest_volume: "5" },
-  { product_title: "Strong", promotion_link: "https://example.com/2", target_sale_price: "12", evaluate_rate: "4.9", lastest_volume: "2000", discount: "30" },
-  { product_title: "Ok", promotion_link: "https://example.com/3", target_sale_price: "8", evaluate_rate: "4.4", lastest_volume: "600" }
+  { product_title: "Weak", product_main_image_url: "https://example.com/1.jpg", promotion_link: "https://example.com/1", target_sale_price: "10", evaluate_rate: "3.8", lastest_volume: "5" },
+  { product_title: "Strong", product_main_image_url: "https://example.com/2.jpg", promotion_link: "https://example.com/2", target_sale_price: "12", evaluate_rate: "4.9", lastest_volume: "2000", discount: "30" },
+  { product_title: "Ok", product_main_image_url: "https://example.com/3.jpg", promotion_link: "https://example.com/3", target_sale_price: "8", evaluate_rate: "4.4", lastest_volume: "600" }
 ], { wantsQuality: true });
 
 assert.equal(ranked.length, 3);
