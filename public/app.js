@@ -127,6 +127,7 @@ async function search(query) {
   const button = form.querySelector("button");
   button.disabled = true;
   results.innerHTML = `<div class="loading">סורק מוצרים, משווה נתונים ובוחר את האפשרויות הכי חזקות...</div>`;
+  focusResults();
 
   try {
     const response = await fetch("/api/recommend", {
@@ -138,11 +139,17 @@ async function search(query) {
     const data = text ? JSON.parse(text) : {};
     if (!response.ok) throw new Error(data.error || "החיפוש נכשל");
     renderProducts(data);
+    focusResults();
   } catch (error) {
     results.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
+    focusResults();
   } finally {
     button.disabled = false;
   }
+}
+
+function focusResults() {
+  results.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function bindQueryButtons(buttons) {
