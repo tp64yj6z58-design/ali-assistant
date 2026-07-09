@@ -32,6 +32,9 @@ async function recommendProducts(userInput) {
   const attempts = buildSearchAttempts(profile);
   const preferences = inferPreferences(query);
   const language = detectLanguage(query);
+  const clarification = buildClarification(query, profile, language);
+  if (clarification) return clarification;
+
   const source = hasAliExpressCredentials() ? "aliexpress" : "demo";
 
   const rawProducts = source === "aliexpress"
@@ -50,6 +53,72 @@ async function recommendProducts(userInput) {
     assistantSummary: buildAssistantSummary(rawProducts.length, products, language),
     products,
     message: buildMessage(query, products, source, language)
+  };
+}
+
+function buildClarification(query, profile, language = "he") {
+  const terms = profile.requiredTerms || [];
+  const hasOnly = (...values) => terms.length && terms.every((term) => values.includes(term));
+
+  if (hasOnly("charger")) {
+    return createClarification(query, language, {
+      he: {
+        question: "איזה סוג מטען אתה מחפש?",
+        options: ["מטען לרכב", "מטען קיר", "מטען אלחוטי", "כבל טעינה"]
+      },
+      en: {
+        question: "Which charger type are you looking for?",
+        options: ["car charger", "wall charger", "wireless charger", "charging cable"]
+      }
+    });
+  }
+
+  if (hasOnly("camera")) {
+    return createClarification(query, language, {
+      he: {
+        question: "איזה סוג מצלמה אתה מחפש?",
+        options: ["מצלמת אבטחה", "מצלמת רכב", "מצלמת רחפן", "מצלמת ילדים"]
+      },
+      en: {
+        question: "Which camera type are you looking for?",
+        options: ["security camera", "dash camera", "drone camera", "kids camera"]
+      }
+    });
+  }
+
+  if (hasOnly("case", "cover")) {
+    return createClarification(query, language, {
+      he: {
+        question: "לאיזה מכשיר צריך כיסוי?",
+        options: ["כיסוי לאייפון", "כיסוי לסמסונג", "כיסוי לאוזניות", "כיסוי לטאבלט"]
+      },
+      en: {
+        question: "What device needs a case?",
+        options: ["iPhone case", "Samsung case", "earbuds case", "tablet case"]
+      }
+    });
+  }
+
+  return null;
+}
+
+function createClarification(query, language, copy) {
+  const selected = copy[language] || copy.he;
+  return {
+    query,
+    keywords: "",
+    attempts: [],
+    language,
+    source: "assistant",
+    scannedCount: 0,
+    needsClarification: true,
+    clarificationQuestion: selected.question,
+    clarificationOptions: selected.options,
+    assistantSummary: language === "en"
+      ? "I need one detail so I can avoid unrelated products."
+      : "אני צריך עוד פרט אחד כדי לא להחזיר מוצרים לא קשורים.",
+    products: [],
+    message: selected.question
   };
 }
 

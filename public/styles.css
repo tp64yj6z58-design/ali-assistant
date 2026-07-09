@@ -44,8 +44,87 @@ body {
   box-shadow: var(--shadow);
 }
 
-.intro {
+.hero {
+  min-height: 390px;
   padding: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 26px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.heroContent {
+  display: grid;
+  justify-items: start;
+}
+
+.brandMark {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #172026;
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(23, 32, 38, 0.22);
+}
+
+.heroPreview {
+  position: relative;
+  min-height: 300px;
+}
+
+.previewCard {
+  position: absolute;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.previewCardMain {
+  inset: 22px 20px auto 18px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.previewCardMain span,
+.previewCardFloat p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.previewImage {
+  min-height: 150px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(230, 74, 46, 0.12), rgba(47, 111, 159, 0.12)),
+    radial-gradient(circle at 70% 35%, #fff 0 18%, transparent 19%),
+    linear-gradient(145deg, #eef3f4, #dce5e8);
+}
+
+.previewCardFloat {
+  inset: auto 0 8px 70px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.miniBadge {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 800;
 }
 
 .eyebrow {
@@ -86,6 +165,22 @@ h1 {
   border-color: rgba(17, 133, 95, 0.35);
 }
 
+.trustRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.trustRow span {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #eef3f4;
+  color: #30424c;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .search {
   padding: 18px;
 }
@@ -100,6 +195,26 @@ label {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 10px;
+}
+
+.exampleChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.exampleChips button,
+.clarifyOptions button,
+.feedback button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #30424c;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 input {
@@ -165,6 +280,17 @@ button:disabled {
   color: #30424c;
   font-size: 16px;
   line-height: 1.5;
+}
+
+.clarification {
+  align-items: start;
+}
+
+.clarifyOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .product {
@@ -246,6 +372,23 @@ button:disabled {
   text-decoration: none;
 }
 
+.feedback {
+  display: flex;
+  gap: 8px;
+  padding: 0 18px;
+}
+
+.feedback button {
+  min-height: 34px;
+  font-size: 13px;
+}
+
+.feedback button.selected {
+  color: #fff;
+  background: var(--green);
+  border-color: var(--green);
+}
+
 .product:hover {
   transform: translateY(-2px);
   transition: transform 160ms ease, box-shadow 160ms ease;
@@ -274,6 +417,15 @@ button:disabled {
 
   .intro {
     padding: 22px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+
+  .heroPreview {
+    min-height: 250px;
   }
 
   .searchRow,

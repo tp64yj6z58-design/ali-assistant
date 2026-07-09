@@ -167,6 +167,11 @@ const PHRASE_TERMS = [
     exclude: ["mount", "cable", "cover", "bracket", "sticker"]
   },
   {
+    pattern: /\u05de\u05e6\u05dc\u05de\u05ea.*\u05e8\u05db\u05d1|\u05de\u05e6\u05dc\u05de\u05d4.*\u05e8\u05db\u05d1|\u05de\u05e6\u05dc\u05de\u05ea.*\u05d0\u05d5\u05d8\u05d5|\u05de\u05e6\u05dc\u05de\u05d4.*\u05d0\u05d5\u05d8\u05d5/,
+    terms: ["car", "camera"],
+    exclude: ["cover", "sticker", "mount", "cable", "holder", "accessories"]
+  },
+  {
     pattern: /\u05e8\u05de\u05e7\u05d5\u05dc.*\u05d1\u05dc\u05d5\u05d8\u05d5\u05e1/,
     terms: ["bluetooth", "speaker"],
     exclude: ["case", "strap", "cable", "adapter", "receiver", "transmitter", "cleaner"]
@@ -543,6 +548,17 @@ function buildSearchKeywords(input) {
 }
 
 const SEARCH_VARIANTS = [
+  { terms: ["car", "charger"], queries: ["car charger", "usb c car charger", "fast car charger", "pd car charger", "car cigarette lighter charger", "multi port car charger"] },
+  { terms: ["wall", "charger"], queries: ["wall charger", "usb c wall charger", "fast wall charger", "pd wall charger", "phone wall charger"] },
+  { terms: ["wireless", "charger"], queries: ["wireless charger", "magsafe wireless charger", "qi wireless charger", "fast wireless charger"] },
+  { terms: ["cable", "charging"], queries: ["charging cable", "usb c charging cable", "iphone charging cable", "fast charging cable"] },
+  { terms: ["car", "camera"], queries: ["dash cam", "car dvr camera", "car camera recorder", "front rear dash cam"] },
+  { terms: ["car", "phone", "holder"], queries: ["car phone holder", "magnetic car phone holder", "dashboard phone holder", "air vent phone holder"] },
+  { terms: ["bluetooth", "earbuds"], queries: ["bluetooth earbuds", "wireless earbuds", "tws earbuds", "noise cancelling earbuds"] },
+  { terms: ["smart", "watch"], queries: ["smart watch", "fitness smart watch", "bluetooth smart watch", "waterproof smart watch"] },
+  { terms: ["security", "camera"], queries: ["security camera", "wifi security camera", "outdoor security camera", "home security camera"] },
+  { terms: ["car", "vacuum", "cleaner"], queries: ["car vacuum cleaner", "portable car vacuum cleaner", "wireless car vacuum", "handheld car vacuum"] },
+  { terms: ["laptop", "stand"], queries: ["laptop stand", "adjustable laptop stand", "foldable laptop stand", "aluminum laptop stand"] },
   { terms: ["air", "fryer"], queries: ["air fryer", "electric air fryer", "air fryer machine", "oil free fryer"] },
   { terms: ["camping", "tent"], queries: ["camping tent", "outdoor camping tent", "2 person tent", "waterproof camping tent"] },
   { terms: ["baby", "stroller"], queries: ["baby stroller", "baby pram stroller", "folding baby stroller", "portable baby stroller"] },
@@ -570,7 +586,7 @@ function buildSearchAttempts(profile) {
 
   return unique(attempts)
     .filter((query) => query && !query.includes("__no_known_translation__"))
-    .slice(0, 6);
+    .slice(0, 8);
 }
 
 function inferPreferences(input) {

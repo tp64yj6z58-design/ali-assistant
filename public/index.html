@@ -9,12 +9,33 @@
   <body>
     <main class="app">
       <section class="workspace">
-        <div class="panel intro">
-          <p class="eyebrow">AliExpress Affiliate Assistant</p>
-          <h1>עוזר מוצרים חכם</h1>
-          <p class="summary">כתבו מה הלקוח מחפש, והמערכת תחזיר את 3 המוצרים הכי משתלמים לפי מחיר, ביקורות, הזמנות ונתוני מוצר.</p>
-          <div id="status" class="status">בודק חיבור...</div>
-        </div>
+        <section class="hero panel">
+          <div class="heroContent">
+            <div class="brandMark">
+              <span>AI</span>
+            </div>
+            <p class="eyebrow">AliExpress Smart Buying Agent</p>
+            <h1>העוזר שמסנן את הרעש ומוצא את 3 המוצרים הכי משתלמים</h1>
+            <p class="summary">הסוכן בודק רלוונטיות, מחיר, דירוג, כמות הזמנות ואביזרים לא קשורים, ואז מציג רק אפשרויות שבאמת שווה לפתוח.</p>
+            <div class="trustRow" aria-label="יתרונות">
+              <span>סינון אביזרים</span>
+              <span>השוואת מחיר ודירוג</span>
+              <span>קישורי Affiliate</span>
+            </div>
+            <div id="status" class="status">בודק חיבור...</div>
+          </div>
+          <div class="heroPreview" aria-hidden="true">
+            <div class="previewCard previewCardMain">
+              <div class="previewImage"></div>
+              <strong>בחירה #1</strong>
+              <span>רלוונטי, נמכר הרבה, מחיר טוב</span>
+            </div>
+            <div class="previewCard previewCardFloat">
+              <span class="miniBadge">AI</span>
+              <p>בודק מוצרים דומים ובוחר רק את החזקים.</p>
+            </div>
+          </div>
+        </section>
 
         <div class="panel search">
           <form id="searchForm">
@@ -22,6 +43,11 @@
             <div class="searchRow">
               <input id="query" name="query" autocomplete="off" placeholder="לדוגמה: מטען מהיר לרכב עם USB-C" required>
               <button type="submit">חפש</button>
+            </div>
+            <div class="exampleChips" aria-label="דוגמאות חיפוש">
+              <button type="button" data-query="מטען לרכב">מטען לרכב</button>
+              <button type="button" data-query="אוזניות בלוטוס">אוזניות בלוטוס</button>
+              <button type="button" data-query="car charger">car charger</button>
             </div>
           </form>
         </div>

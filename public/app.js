@@ -2,6 +2,7 @@ const form = document.querySelector("#searchForm");
 const input = document.querySelector("#query");
 const results = document.querySelector("#results");
 const statusEl = document.querySelector("#status");
+const exampleButtons = document.querySelectorAll("[data-query]");
 
 async function loadStatus() {
   try {
@@ -28,6 +29,8 @@ function labels(language) {
         rating: "Rating",
         orders: "orders",
         open: "Open product",
+        good: "Good match",
+        bad: "Not relevant",
         noResults: "I did not find products strong enough. Try a more specific search."
       }
     : {
@@ -35,12 +38,30 @@ function labels(language) {
         rating: "דירוג",
         orders: "הזמנות",
         open: "פתח מוצר",
+        good: "מתאים",
+        bad: "לא מתאים",
         noResults: "לא נמצאו מוצרים מספיק טובים. נסה ניסוח אחר."
       };
 }
 
 function renderProducts(data) {
   const ui = labels(data.language);
+
+  if (data.needsClarification) {
+    results.innerHTML = `
+      <div class="assistantNote clarification" dir="${data.language === "en" ? "ltr" : "rtl"}">
+        <div class="assistantBadge">AI</div>
+        <div>
+          <p>${escapeHtml(data.clarificationQuestion || data.assistantSummary)}</p>
+          <div class="clarifyOptions">
+            ${(data.clarificationOptions || []).map((option) => `<button type="button" data-query="${escapeAttribute(option)}">${escapeHtml(option)}</button>`).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+    bindQueryButtons(results.querySelectorAll("[data-query]"));
+    return;
+  }
 
   if (!data.products.length) {
     results.innerHTML = `<div class="empty">${escapeHtml(data.assistantSummary || ui.noResults)}</div>`;
@@ -70,9 +91,15 @@ function renderProducts(data) {
       <ul class="reasons">
         ${product.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}
       </ul>
+      <div class="feedback" data-product-id="${escapeAttribute(product.id || product.title)}">
+        <button type="button" data-feedback="good">${ui.good}</button>
+        <button type="button" data-feedback="bad">${ui.bad}</button>
+      </div>
       <a href="${escapeAttribute(product.productUrl)}" target="_blank" rel="noreferrer">${ui.open}</a>
     </article>
   `).join("");
+
+  bindFeedback();
 }
 
 function escapeHtml(value) {
@@ -91,9 +118,12 @@ function escapeAttribute(value) {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const query = input.value.trim();
-  if (!query) return;
+  search(input.value.trim());
+});
 
+async function search(query) {
+  if (!query) return;
+  input.value = query;
   const button = form.querySelector("button");
   button.disabled = true;
   results.innerHTML = `<div class="loading">סורק מוצרים, משווה נתונים ובוחר את האפשרויות הכי חזקות...</div>`;
@@ -113,6 +143,23 @@ form.addEventListener("submit", async (event) => {
   } finally {
     button.disabled = false;
   }
-});
+}
 
+function bindQueryButtons(buttons) {
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => search(button.dataset.query));
+  });
+}
+
+function bindFeedback() {
+  results.querySelectorAll("[data-feedback]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const box = button.closest(".feedback");
+      box.querySelectorAll("button").forEach((item) => item.classList.remove("selected"));
+      button.classList.add("selected");
+    });
+  });
+}
+
+bindQueryButtons(exampleButtons);
 loadStatus();
