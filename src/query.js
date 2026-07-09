@@ -83,10 +83,20 @@ const HEBREW_TERMS = new Map([
   ["\u05d1\u05dc\u05e0\u05d3\u05e8", ["blender"]],
   ["\u05de\u05d8\u05d7\u05e0\u05ea", ["grinder"]],
   ["\u05e7\u05e4\u05d4", ["coffee"]],
-  ["\u05de\u05dc\u05d7\u05dd", ["soldering", "iron"]]
+  ["\u05de\u05dc\u05d7\u05dd", ["soldering", "iron"]],
+  ["\u05de\u05d7\u05d6\u05d9\u05e7", ["holder"]],
+  ["\u05de\u05e4\u05ea\u05d7", ["key"]],
+  ["\u05de\u05e4\u05ea\u05d7\u05d5\u05ea", ["keys"]],
+  ["\u05de\u05e4\u05ea\u05d5\u05d7\u05ea", ["keys"]],
+  ["\u05e6\u05e8\u05d5\u05e8", ["keychain"]]
 ]);
 
 const PHRASE_TERMS = [
+  {
+    pattern: /\u05de\u05d7\u05d6\u05d9\u05e7.*\u05de\u05e4\u05ea\u05d7|\u05de\u05d7\u05d6\u05d9\u05e7.*\u05de\u05e4\u05ea\u05d5\u05d7\u05ea|\u05e6\u05e8\u05d5\u05e8.*\u05de\u05e4\u05ea\u05d7/,
+    terms: ["keychain"],
+    exclude: ["keyboard", "keycap", "switch", "piano", "case only"]
+  },
   {
     pattern: /\u05de\u05d8\u05e2\u05df.*\u05e8\u05db\u05d1|\u05de\u05d8\u05e2\u05df.*\u05d0\u05d5\u05d8\u05d5/,
     terms: ["car", "charger"]
@@ -401,9 +411,6 @@ function buildSearchProfile(input) {
   });
 
   const requiredTerms = unique(required).map((term) => term.toLowerCase());
-  if (!requiredTerms.length && /[\u0590-\u05ff]/.test(normalized)) {
-    requiredTerms.push("__no_known_translation__");
-  }
   addCategoryExclusions(requiredTerms, excluded);
   const keywords = unique([...translated, ...cleanedHebrewTokens]).join(" ");
   const excludedTerms = unique(excluded).map((term) => term.toLowerCase());
@@ -411,6 +418,7 @@ function buildSearchProfile(input) {
   return {
     original: normalized,
     keywords: keywords || normalized,
+    hasKnownTranslation: requiredTerms.length > 0,
     requiredTerms,
     excludedTerms
   };
@@ -541,6 +549,10 @@ function addCategoryExclusions(requiredTerms, excluded) {
   if (has("soldering") && has("iron")) {
     excluded.push("tip", "tips", "cleaner", "paste", "refresher", "ball", "mesh", "stand", "holder", "mat", "wire", "solder wire", "flux", "fluid", "head", "heads", "pump", "sucker", "desoldering");
   }
+
+  if (has("keychain")) {
+    excluded.push("screwdriver", "repair tool", "precision", "glasses", "watch repair", "badge reel", "retractable holder", "cord", "lanyard", "rope", "diy", "craft", "jump ring", "phone rope", "airtag case", "case only", "cover only", "keycap", "keyboard", "switch", "cable", "charging", "power bank", "usb c", "type c");
+  }
 }
 
 function buildSearchKeywords(input) {
@@ -548,6 +560,7 @@ function buildSearchKeywords(input) {
 }
 
 const SEARCH_VARIANTS = [
+  { terms: ["keychain"], queries: ["keychain", "key ring", "metal keychain", "car keychain", "cute keychain"] },
   { terms: ["car", "charger"], queries: ["car charger", "usb c car charger", "fast car charger", "pd car charger", "car cigarette lighter charger", "multi port car charger"] },
   { terms: ["wall", "charger"], queries: ["wall charger", "usb c wall charger", "fast wall charger", "pd wall charger", "phone wall charger"] },
   { terms: ["wireless", "charger"], queries: ["wireless charger", "magsafe wireless charger", "qi wireless charger", "fast wireless charger"] },
@@ -585,7 +598,7 @@ function buildSearchAttempts(profile) {
   }
 
   return unique(attempts)
-    .filter((query) => query && !query.includes("__no_known_translation__"))
+    .filter(Boolean)
     .slice(0, 8);
 }
 
