@@ -74,7 +74,8 @@ form.addEventListener("submit", async (event) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query })
     });
-    const data = await response.json();
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
     if (!response.ok) throw new Error(data.error || "החיפוש נכשל");
     renderProducts(data);
   } catch (error) {
