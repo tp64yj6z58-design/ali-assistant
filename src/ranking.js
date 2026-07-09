@@ -17,9 +17,10 @@ function normalizeRating(value) {
 function normalizeProducts(rawProducts) {
   return rawProducts.map((product) => ({
     id: String(product.product_id || product.itemId || product.id || ""),
-    title: product.product_title || product.title || product.name || "AliExpress product",
+    title: product.localized_title || product.product_title || product.title || product.name || "AliExpress product",
+    searchTitle: product.product_title || product.title || product.name || product.localized_title || "AliExpress product",
     imageUrl: product.product_main_image_url || product.imageUrl || product.image || "",
-    productUrl: product.promotion_link || product.product_detail_url || product.url || "",
+    productUrl: product.localized_promotion_link || product.promotion_link || product.product_detail_url || product.url || "",
     price: toNumber(product.target_sale_price || product.sale_price || product.price),
     originalPrice: toNumber(product.target_original_price || product.original_price),
     currency: product.target_sale_price_currency || product.currency || "",
@@ -41,14 +42,12 @@ function termAppears(title, term) {
 }
 
 function relevanceScore(product, profile = {}) {
-  const title = product.title.toLowerCase();
+  const title = (product.searchTitle || product.title).toLowerCase();
   const requiredTerms = profile.requiredTerms || [];
   const excludedTerms = profile.excludedTerms || [];
-  const titleIsHebrew = /[\u0590-\u05ff]/.test(title);
 
   if (excludedTerms.some((term) => termAppears(title, term))) return -25;
   if (!requiredTerms.length) return 0;
-  if (titleIsHebrew && requiredTerms.every((term) => /^[a-z0-9 -]+$/i.test(term))) return 8;
 
   const matched = requiredTerms.filter((term) => termAppears(title, term)).length;
   const ratio = matched / requiredTerms.length;

@@ -54,12 +54,13 @@ async function recommendProducts(userInput) {
 }
 
 async function searchAliExpressAttempts(attempts, language = "he") {
+  if (language === "he") return searchAliExpressHebrewAttempts(attempts);
+
   const allProducts = [];
   const seen = new Set();
-  const targetLanguage = language === "he" ? "HE" : "EN";
 
   for (const attempt of attempts) {
-    const products = await searchAliExpressProducts(attempt, { targetLanguage });
+    const products = await searchAliExpressProducts(attempt, { targetLanguage: "EN" });
     for (const product of products) {
       const key = String(product.product_id || product.itemId || product.id || product.product_title || product.title || "");
       if (key && seen.has(key)) continue;
@@ -69,6 +70,46 @@ async function searchAliExpressAttempts(attempts, language = "he") {
   }
 
   return allProducts;
+}
+
+async function searchAliExpressHebrewAttempts(attempts) {
+  const englishProducts = [];
+  const hebrewById = new Map();
+  const seen = new Set();
+  const englishAttempts = attempts.filter((attempt) => !/[\u0590-\u05ff]/.test(attempt));
+
+  for (const attempt of englishAttempts) {
+    const [englishResults, hebrewResults] = await Promise.all([
+      searchAliExpressProducts(attempt, { targetLanguage: "EN" }),
+      searchAliExpressProducts(attempt, { targetLanguage: "HE" })
+    ]);
+
+    for (const product of hebrewResults) {
+      const id = String(product.product_id || product.itemId || product.id || "");
+      if (id) hebrewById.set(id, product);
+    }
+
+    for (const product of englishResults) {
+      const id = String(product.product_id || product.itemId || product.id || "");
+      const key = id || String(product.product_title || product.title || "");
+      if (key && seen.has(key)) continue;
+      if (key) seen.add(key);
+
+      const hebrewProduct = id ? hebrewById.get(id) : null;
+      englishProducts.push(hebrewProduct ? mergeLocalizedProduct(product, hebrewProduct) : product);
+    }
+  }
+
+  return englishProducts;
+}
+
+function mergeLocalizedProduct(baseProduct, localizedProduct) {
+  return {
+    ...baseProduct,
+    localized_title: localizedProduct.product_title || localizedProduct.title || "",
+    localized_promotion_link: localizedProduct.promotion_link || localizedProduct.product_detail_url || "",
+    localized_product_detail_url: localizedProduct.product_detail_url || ""
+  };
 }
 
 function detectLanguage(input) {
