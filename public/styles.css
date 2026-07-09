@@ -7,6 +7,8 @@
   --line: #dce5e8;
   --accent: #e64a2e;
   --accent-dark: #b93622;
+  --gold: #f4b23f;
+  --blue: #2f6f9f;
   --green: #11855f;
   --shadow: 0 16px 40px rgba(28, 45, 55, 0.12);
 }
@@ -133,6 +135,38 @@ button:disabled {
   gap: 14px;
 }
 
+.assistantNote {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #fff, #f8fbfb);
+  border: 1px solid rgba(47, 111, 159, 0.22);
+  border-inline-start: 4px solid var(--blue);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.assistantBadge {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #172026;
+  color: #fff;
+  font-weight: 800;
+}
+
+.assistantNote p {
+  margin: 0;
+  color: #30424c;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
 .product {
   min-height: 280px;
   overflow: hidden;
@@ -210,6 +244,12 @@ button:disabled {
   color: var(--accent-dark);
   font-weight: 700;
   text-decoration: none;
+}
+
+.product:hover {
+  transform: translateY(-2px);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 20px 48px rgba(28, 45, 55, 0.16);
 }
 
 .empty,

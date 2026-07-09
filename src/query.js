@@ -559,7 +559,7 @@ const SEARCH_VARIANTS = [
 ];
 
 function buildSearchAttempts(profile) {
-  const attempts = [profile.keywords];
+  const attempts = [profile.keywords, profile.original];
   const requiredTerms = profile.requiredTerms || [];
 
   for (const variant of SEARCH_VARIANTS) {
@@ -570,7 +570,7 @@ function buildSearchAttempts(profile) {
 
   return unique(attempts)
     .filter((query) => query && !query.includes("__no_known_translation__"))
-    .slice(0, 5);
+    .slice(0, 6);
 }
 
 function inferPreferences(input) {

@@ -46,6 +46,8 @@ async function recommendProducts(userInput) {
     attempts,
     language,
     source,
+    scannedCount: rawProducts.length,
+    assistantSummary: buildAssistantSummary(rawProducts.length, products, language),
     products,
     message: buildMessage(query, products, source, language)
   };
@@ -76,6 +78,18 @@ function detectLanguage(input) {
 function buildMessage(query, products, source, language = "he") {
   if (language === "en") return buildEnglishMessage(query, products, source);
   return buildHebrewMessage(query, products, source);
+}
+
+function buildAssistantSummary(scannedCount, products, language = "he") {
+  if (!products.length) {
+    return language === "en"
+      ? `I checked the available matching products, but did not find 3 options strong enough to recommend.`
+      : `בדקתי את המוצרים הזמינים שמתאימים לחיפוש, אבל לא מצאתי 3 אפשרויות מספיק חזקות להמלצה.`;
+  }
+
+  return language === "en"
+    ? `I checked ${scannedCount} similar products and selected the ${products.length} strongest options by relevance, price, rating and order volume.`
+    : `בדקתי ${scannedCount} מוצרים דומים ובחרתי את ${products.length} האפשרויות החזקות ביותר לפי רלוונטיות, מחיר, דירוג וכמות הזמנות.`;
 }
 
 function buildEnglishMessage(query, products, source) {
@@ -112,4 +126,4 @@ function buildHebrewMessage(query, products, source) {
   return `${intro}\n\n${lines.join("\n\n")}`;
 }
 
-module.exports = { recommendProducts, buildHebrewMessage, buildEnglishMessage, detectLanguage, searchAliExpressAttempts };
+module.exports = { recommendProducts, buildAssistantSummary, buildHebrewMessage, buildEnglishMessage, detectLanguage, searchAliExpressAttempts };
