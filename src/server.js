@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { config, hasAliExpressCredentials } = require("./config");
 const { recommendProducts } = require("./assistant");
+const { saveFeedback } = require("./feedbackStore");
 
 const publicDir = path.join(__dirname, "..", "public");
 
@@ -59,6 +60,13 @@ const server = http.createServer(async (req, res) => {
       const body = await readJsonBody(req);
       const result = await recommendProducts(body.query);
       sendJson(res, 200, result);
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/feedback") {
+      const body = await readJsonBody(req);
+      const feedback = saveFeedback(body);
+      sendJson(res, 200, { ok: true, feedback });
       return;
     }
 

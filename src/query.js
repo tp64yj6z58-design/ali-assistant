@@ -420,6 +420,8 @@ const HEBREW_STOP_WORDS = new Set([
   "\u05e6\u05e8\u05d9\u05da",
   "\u05e6\u05e8\u05d9\u05db\u05d4",
   "\u05de\u05db\u05e9\u05d9\u05e8",
+  "\u05de\u05db\u05d5\u05e0\u05d4",
+  "\u05de\u05db\u05d5\u05e0\u05ea",
   "\u05dc\u05d9",
   "\u05e2\u05dd",
   "\u05e9\u05dc",
@@ -866,10 +868,14 @@ function buildSearchAttempts(profile) {
 
 function inferPreferences(input) {
   const text = normalizeQuery(input).toLowerCase();
+  const maxPriceMatch = text.match(/(?:עד|under|below|max|maximum)\s*(\d+(?:\.\d+)?)/i);
+  const minPriceMatch = text.match(/(?:מעל|over|above|minimum|min)\s*(\d+(?:\.\d+)?)/i);
   return {
     wantsFastShipping: /\u05de\u05d4\u05d9\u05e8|\u05d3\u05d7\u05d5\u05e3|fast|quick/.test(text),
     wantsCheap: /\u05d6\u05d5\u05dc|\u05de\u05e9\u05ea\u05dc\u05dd|\u05de\u05d7\u05d9\u05e8|cheap|budget/.test(text),
-    wantsQuality: /\u05d0\u05d9\u05db\u05d5\u05ea|\u05d8\u05d5\u05d1|\u05de\u05d5\u05de\u05dc\u05e5|\u05d1\u05d9\u05e7\u05d5\u05e8\u05d5\u05ea|quality|best|review/.test(text)
+    wantsQuality: /\u05d0\u05d9\u05db\u05d5\u05ea|\u05d8\u05d5\u05d1|\u05de\u05d5\u05de\u05dc\u05e5|\u05d1\u05d9\u05e7\u05d5\u05e8\u05d5\u05ea|quality|best|review/.test(text),
+    maxPrice: maxPriceMatch ? Number(maxPriceMatch[1]) : null,
+    minPrice: minPriceMatch ? Number(minPriceMatch[1]) : null
   };
 }
 

@@ -4,6 +4,9 @@ const { pickTopProducts } = require("./ranking");
 const { searchAliExpressProducts } = require("./providers/aliexpressProvider");
 const { searchMockProducts } = require("./providers/mockProvider");
 
+const CACHE_TTL_MS = 1000 * 60 * 20;
+const cache = new Map();
+
 const text = {
   missingQuery: "\u05e6\u05e8\u05d9\u05da \u05dc\u05db\u05ea\u05d5\u05d1 \u05d0\u05d9\u05d6\u05d4 \u05de\u05d5\u05e6\u05e8 \u05de\u05d7\u05e4\u05e9\u05d9\u05dd.",
   noProductsPrefix: "\u05dc\u05d0 \u05de\u05e6\u05d0\u05ea\u05d9 \u05db\u05e8\u05d2\u05e2 \u05de\u05d5\u05e6\u05e8\u05d9\u05dd \u05de\u05e1\u05e4\u05d9\u05e7 \u05e8\u05dc\u05d5\u05d5\u05e0\u05d8\u05d9\u05d9\u05dd \u05e2\u05d1\u05d5\u05e8",
@@ -28,6 +31,10 @@ async function recommendProducts(userInput) {
   }
 
   const profile = buildSearchProfile(query);
+  const cacheKey = `${detectLanguage(query)}:${profile.requiredTerms.join("|")}:${profile.keywords}:${query}`.toLowerCase();
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
   const keywords = profile.keywords;
   const attempts = buildSearchAttempts(profile);
   const preferences = inferPreferences(query);
@@ -42,18 +49,27 @@ async function recommendProducts(userInput) {
     : searchMockProducts(keywords);
 
   const products = pickTopProducts(rawProducts, preferences, profile, language);
+  const confidence = buildResultConfidence(products, rawProducts.length, profile);
+  const refinements = buildRefinementOptions(query, profile, language);
+  const lowConfidence = Boolean(profile.requiredTerms.length && confidence < 62);
 
-  return {
+  const result = {
     query,
     keywords,
     attempts,
     language,
     source,
     scannedCount: rawProducts.length,
-    assistantSummary: buildAssistantSummary(rawProducts.length, products, language),
-    products,
+    confidence,
+    lowConfidence,
+    refinementOptions: lowConfidence ? refinements : [],
+    assistantSummary: buildAssistantSummary(rawProducts.length, lowConfidence ? [] : products, language),
+    products: lowConfidence ? [] : products,
     message: buildMessage(query, products, source, language)
   };
+
+  setCached(cacheKey, result);
+  return result;
 }
 
 function buildClarification(query, profile, language = "he") {
@@ -99,6 +115,58 @@ function buildClarification(query, profile, language = "he") {
     });
   }
 
+  if (hasOnly("bag")) {
+    return createClarification(query, language, {
+      he: {
+        question: "איזה סוג תיק אתה מחפש?",
+        options: ["תיק גב", "תיק למחשב נייד", "תיק נסיעות", "תיק צד"]
+      },
+      en: {
+        question: "Which bag type are you looking for?",
+        options: ["backpack", "laptop bag", "travel bag", "shoulder bag"]
+      }
+    });
+  }
+
+  if (hasOnly("lamp") || hasOnly("light")) {
+    return createClarification(query, language, {
+      he: {
+        question: "איזו תאורה אתה מחפש?",
+        options: ["מנורת שולחן לד", "מנורת לילה", "פנס ראש", "תאורת לד לחדר"]
+      },
+      en: {
+        question: "Which light type are you looking for?",
+        options: ["desk lamp", "night light", "headlamp", "led room lights"]
+      }
+    });
+  }
+
+  if (hasOnly("watch")) {
+    return createClarification(query, language, {
+      he: {
+        question: "אתה מחפש שעון או רצועה לשעון?",
+        options: ["שעון חכם", "רצועה לשעון", "שעון ספורט", "שעון ילדים"]
+      },
+      en: {
+        question: "Are you looking for a watch or a watch band?",
+        options: ["smart watch", "watch band", "sport watch", "kids watch"]
+      }
+    });
+  }
+
+  if (hasOnly("holder", "stand") || hasOnly("holder")) {
+    return createClarification(query, language, {
+      he: {
+        question: "מחזיק למה?",
+        options: ["מחזיק מפתחות", "מעמד לטלפון לרכב", "מעמד למחשב נייד", "מחזיק כבלים"]
+      },
+      en: {
+        question: "What should the holder be for?",
+        options: ["keychain", "car phone holder", "laptop stand", "cable holder"]
+      }
+    });
+  }
+
   return null;
 }
 
@@ -128,14 +196,9 @@ async function searchAliExpressAttempts(attempts, language = "he", profile = {})
   const allProducts = [];
   const seen = new Set();
 
-  for (const attempt of attempts) {
-    const products = await searchAliExpressProducts(attempt, { targetLanguage: "EN" });
-    for (const product of products) {
-      const key = String(product.product_id || product.itemId || product.id || product.product_title || product.title || "");
-      if (key && seen.has(key)) continue;
-      if (key) seen.add(key);
-      allProducts.push(product);
-    }
+  const batches = await mapWithConcurrency(attempts, 3, (attempt) => searchAliExpressProducts(attempt, { targetLanguage: "EN" }));
+  for (const products of batches) {
+    for (const product of products) addUniqueProduct(allProducts, seen, product);
   }
 
   return allProducts;
@@ -151,12 +214,13 @@ async function searchAliExpressHebrewAttempts(attempts, profile = {}) {
     return searchDirectHebrewAttempts(attempts);
   }
 
-  for (const attempt of englishAttempts) {
-    const [englishResults, hebrewResults] = await Promise.all([
+  const batches = await mapWithConcurrency(englishAttempts, 3, (attempt) => Promise.all([
       searchAliExpressProducts(attempt, { targetLanguage: "EN" }),
       searchAliExpressProducts(attempt, { targetLanguage: "HE" })
-    ]);
+    ]));
 
+  for (const batch of batches) {
+    const [englishResults = [], hebrewResults = []] = Array.isArray(batch[0]) ? batch : [[], []];
     for (const product of hebrewResults) {
       const id = String(product.product_id || product.itemId || product.id || "");
       if (id) hebrewById.set(id, product);
@@ -165,11 +229,8 @@ async function searchAliExpressHebrewAttempts(attempts, profile = {}) {
     for (const product of englishResults) {
       const id = String(product.product_id || product.itemId || product.id || "");
       const key = id || String(product.product_title || product.title || "");
-      if (key && seen.has(key)) continue;
-      if (key) seen.add(key);
-
       const hebrewProduct = id ? hebrewById.get(id) : null;
-      englishProducts.push(hebrewProduct ? mergeLocalizedProduct(product, hebrewProduct) : product);
+      addUniqueProduct(englishProducts, seen, hebrewProduct ? mergeLocalizedProduct(product, hebrewProduct) : product);
     }
   }
 
@@ -180,17 +241,40 @@ async function searchDirectHebrewAttempts(attempts) {
   const allProducts = [];
   const seen = new Set();
 
-  for (const attempt of attempts) {
-    const products = await searchAliExpressProducts(attempt, { targetLanguage: "HE" });
-    for (const product of products) {
-      const key = String(product.product_id || product.itemId || product.id || product.product_title || product.title || "");
-      if (key && seen.has(key)) continue;
-      if (key) seen.add(key);
-      allProducts.push(product);
-    }
+  const batches = await mapWithConcurrency(attempts, 3, (attempt) => searchAliExpressProducts(attempt, { targetLanguage: "HE" }));
+  for (const products of batches) {
+    for (const product of products) addUniqueProduct(allProducts, seen, product);
   }
 
   return allProducts;
+}
+
+function addUniqueProduct(list, seen, product) {
+  const key = String(product.product_id || product.itemId || product.id || product.product_title || product.title || "");
+  if (key && seen.has(key)) return;
+  if (key) seen.add(key);
+  list.push(product);
+}
+
+async function mapWithConcurrency(values, limit, task) {
+  const results = new Array(values.length);
+  let index = 0;
+
+  async function worker() {
+    while (index < values.length) {
+      const current = index;
+      index += 1;
+      try {
+        results[current] = await task(values[current]);
+      } catch (error) {
+        console.warn("Search attempt failed", values[current], error.message);
+        results[current] = [];
+      }
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(limit, values.length) }, worker));
+  return results;
 }
 
 function mergeLocalizedProduct(baseProduct, localizedProduct) {
@@ -255,6 +339,57 @@ function buildHebrewMessage(query, products, source) {
   });
 
   return `${intro}\n\n${lines.join("\n\n")}`;
+}
+
+function buildResultConfidence(products, scannedCount, profile = {}) {
+  if (!products.length) return scannedCount ? 35 : 0;
+  const average = products.reduce((sum, product) => sum + (product.confidence || 0), 0) / products.length;
+  const coverage = products.length >= 3 ? 8 : products.length * 2;
+  const knownBoost = profile.requiredTerms && profile.requiredTerms.length ? 5 : 0;
+  return Math.min(100, Math.round(average + coverage + knownBoost));
+}
+
+function buildRefinementOptions(query, profile = {}, language = "he") {
+  const terms = profile.requiredTerms || [];
+  const original = query.trim();
+  if (language === "en") {
+    return [
+      `${original} best rated`,
+      `${original} with many orders`,
+      `${original} official store`
+    ];
+  }
+
+  if (terms.includes("charger")) return ["מטען לרכב USB-C", "מטען קיר מהיר", "מטען נייד 20000mAh", "מטען אלחוטי"];
+  if (terms.includes("camera")) return ["מצלמת אבטחה לבית", "מצלמה לרכב", "מצלמת רשת למחשב", "מצלמת ילדים"];
+  if (terms.includes("case") || terms.includes("cover")) return ["כיסוי לאייפון", "כיסוי לסמסונג", "מגן מסך לאייפון", "כיסוי לטאבלט"];
+  if (terms.includes("bag")) return ["תיק גב לבית ספר", "תיק למחשב נייד", "תיק נסיעות", "תיק צד"];
+  if (terms.includes("lamp") || terms.includes("light")) return ["מנורת שולחן לד", "מנורת לילה", "פנס ראש", "תאורת לד לחדר"];
+
+  return [
+    `${original} עם דירוג גבוה`,
+    `${original} הכי נמכר`,
+    `${original} איכותי`,
+    `${original} מקורי`
+  ];
+}
+
+function getCached(key) {
+  const item = cache.get(key);
+  if (!item) return null;
+  if (Date.now() - item.createdAt > CACHE_TTL_MS) {
+    cache.delete(key);
+    return null;
+  }
+  return { ...item.value, cached: true };
+}
+
+function setCached(key, value) {
+  cache.set(key, { createdAt: Date.now(), value });
+  if (cache.size > 250) {
+    const firstKey = cache.keys().next().value;
+    cache.delete(firstKey);
+  }
 }
 
 module.exports = { recommendProducts, buildAssistantSummary, buildHebrewMessage, buildEnglishMessage, detectLanguage, searchAliExpressAttempts };

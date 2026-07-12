@@ -1,8 +1,12 @@
 const { recommendProducts } = require("./assistant");
 
 const CASES = [
-  { query: "מטען לרכב", must: ["car", "charger"], avoid: ["cable", "cord", "wire", "connector"] },
-  { query: "מטען קיר מהיר", must: ["charger"], any: ["wall", "gan", "usb", "pd"], avoid: ["cable", "cord"] },
+  { query: "מטען לרכב", must: ["car"], any: ["charger", "adapter"], avoid: ["cable", "cord", "wire", "organizer"] },
+  { query: "מטען קיר מהיר", must: ["charger"], any: ["wall", "gan", "usb", "pd"], avoid: ["car", "cable", "cord"] },
+  { query: "מטען נייד", must: ["power"], any: ["bank", "portable charger", "external battery"], avoid: ["case", "cover", "cable", "lamp"] },
+  { query: "מחזיק מפתחות", any: ["keychain", "key ring"], avoid: ["keyboard", "keycap", "cable", "charger"] },
+  { query: "מגן מסך לאייפון", must: ["screen"], any: ["protector", "glass"], avoid: ["case", "charger", "cable"] },
+  { query: "כיסוי לאייפון", must: ["iphone"], any: ["case", "cover"], avoid: ["screen protector", "charger", "cable"] },
   { query: "אוזניות בלוטוס", must: ["bluetooth"], any: ["earbuds", "headphones", "earphone"], avoid: ["case", "cover", "tips"] },
   { query: "שעון חכם", must: ["smart", "watch"], avoid: ["band", "strap", "bracelet", "case", "cover"] },
   { query: "תיק גב", any: ["backpack", "rucksack", "school bag", "travel bag"], avoid: ["patch", "strap", "keychain", "zipper", "webbing"] },
@@ -20,7 +24,11 @@ const CASES = [
   { query: "משקל מטבח", must: ["scale"], any: ["kitchen", "digital"], avoid: ["spoon", "bowl"] },
   { query: "מצלמת אבטחה", must: ["camera"], any: ["security", "wifi", "ip"], avoid: ["mount", "cable", "cover"] },
   { query: "רמקול בלוטוס", must: ["bluetooth"], any: ["speaker"], avoid: ["case", "strap", "cable"] },
-  { query: "מקרן נייד", any: ["projector"], avoid: ["screen", "remote", "case", "stand"] }
+  { query: "מקרן נייד", any: ["projector"], avoid: ["screen", "remote", "case", "stand"] },
+  { query: "צעצוע לכלב", must: ["dog"], any: ["toy", "ball", "chew"], avoid: ["collar", "leash", "bowl", "bed"] },
+  { query: "ארנק לגבר", any: ["wallet", "card holder"], avoid: ["organizer bag", "cable", "hanger"] },
+  { query: "פנס ראש", any: ["headlamp", "head flashlight"], avoid: ["strap only", "bicycle tail light"] },
+  { query: "כרטיס זיכרון", must: ["memory"], any: ["card", "micro sd", "tf"], avoid: ["reader", "case", "holder"] }
 ];
 
 function words(text) {
@@ -51,7 +59,7 @@ async function runQualityCheck() {
     const result = await recommendProducts(testCase.query);
     const checks = result.products.map((product) => ({
       title: product.title,
-      check: evaluateTitle(product.title, testCase)
+      check: evaluateTitle(product.searchTitle || product.title, testCase)
     }));
     const passed = checks.filter((item) => item.check.ok).length;
     rows.push({
@@ -59,6 +67,7 @@ async function runQualityCheck() {
       keywords: result.keywords,
       count: result.products.length,
       passed,
+      confidence: result.confidence,
       titles: checks.map((item) => ({
         ok: item.check.ok,
         title: item.title,
@@ -74,7 +83,7 @@ if (require.main === module) {
   runQualityCheck()
     .then((rows) => {
       for (const row of rows) {
-        console.log(`\n${row.passed}/${row.count} ${row.query} -> ${row.keywords}`);
+        console.log(`\n${row.passed}/${row.count} confidence=${row.confidence} ${row.query} -> ${row.keywords}`);
         for (const title of row.titles) {
           console.log(`${title.ok ? "OK" : "BAD"} ${title.title}`);
           if (title.missingMust.length) console.log(`  missing: ${title.missingMust.join(", ")}`);
@@ -83,7 +92,13 @@ if (require.main === module) {
       }
       const total = rows.reduce((sum, row) => sum + row.count, 0);
       const passed = rows.reduce((sum, row) => sum + row.passed, 0);
-      console.log(`\nTOTAL ${passed}/${total}`);
+      const empty = rows.filter((row) => row.count === 0).length;
+      const ratio = total ? passed / total : 0;
+      console.log(`\nTOTAL ${passed}/${total} empty=${empty} ratio=${Math.round(ratio * 100)}%`);
+
+      if (ratio < 0.68 || empty > 8) {
+        process.exitCode = 1;
+      }
     })
     .catch((error) => {
       console.error(error);

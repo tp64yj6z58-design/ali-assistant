@@ -37,7 +37,16 @@ function termAppears(title, term) {
     .toLowerCase()
     .replace(/powerbank/g, "power bank")
     .replace(/screenprotector/g, "screen protector")
-    .replace(/watchband/g, "watch band");
+    .replace(/watchband/g, "watch band")
+    .replace(/key ring/g, "keychain")
+    .replace(/key holder/g, "keychain")
+    .replace(/tws/g, "earbuds")
+    .replace(/earphones/g, "earbuds")
+    .replace(/earphone/g, "earbuds")
+    .replace(/dashcam/g, "dash cam")
+    .replace(/dash camera/g, "dash cam")
+    .replace(/electric screwdriver/g, "cordless drill")
+    .replace(/power drill/g, "cordless drill");
   const words = String(term).toLowerCase().split(/\s+/).filter(Boolean);
   return words.every((word) => {
     const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -61,6 +70,24 @@ function relevanceScore(product, profile = {}) {
   return Math.round(ratio * 28);
 }
 
+function confidenceScore(product, profile = {}) {
+  const requiredTerms = profile.requiredTerms || [];
+  if (!requiredTerms.length) return 70;
+
+  const title = (product.searchTitle || product.title || "").toLowerCase();
+  const matched = requiredTerms.filter((term) => termAppears(title, term)).length;
+  const relevance = relevanceScore(product, profile);
+  const dataStrength = [
+    product.imageUrl,
+    product.productUrl,
+    product.price,
+    product.rating >= 4.3,
+    product.orders >= 50
+  ].filter(Boolean).length;
+
+  return clamp(Math.round((matched / requiredTerms.length) * 62 + Math.max(relevance, 0) + dataStrength * 3), 0, 100);
+}
+
 function scoreProduct(product, preferences = {}) {
   const ratingScore = clamp(product.rating / 5, 0, 1) * 34;
   const ordersScore = clamp(Math.log10(product.orders + 1) / 4, 0, 1) * 22;
@@ -73,6 +100,8 @@ function scoreProduct(product, preferences = {}) {
   if (preferences.wantsCheap) preferenceBoost += priceScore * 0.2;
   if (preferences.wantsQuality) preferenceBoost += ratingScore * 0.15;
   if (preferences.wantsFastShipping && product.shipping) preferenceBoost += 4;
+  if (preferences.maxPrice && product.price) preferenceBoost += product.price <= preferences.maxPrice ? 8 : -18;
+  if (preferences.minPrice && product.price) preferenceBoost += product.price >= preferences.minPrice ? 4 : -8;
 
   return Math.round(ratingScore + ordersScore + discountScore + priceScore + dataScore + preferenceBoost);
 }
@@ -115,19 +144,28 @@ function uniqueRankedProducts(products) {
 
 function pickTopProducts(rawProducts, preferences, profile = {}, language = "he") {
   const requiresRelevantMatch = Boolean(profile.requiredTerms && profile.requiredTerms.length);
+  const minimumConfidence = requiresRelevantMatch ? 58 : 35;
 
   const ranked = normalizeProducts(rawProducts)
     .filter((product) => product.title && product.productUrl && product.imageUrl)
-    .map((product) => ({
-      ...product,
-      relevance: relevanceScore(product, profile),
-      score: scoreProduct(product, preferences) + relevanceScore(product, profile),
-      reasons: explainChoice(product, language)
-    }))
-    .filter((product) => requiresRelevantMatch ? product.relevance > 0 : product.relevance > -18)
+    .map((product) => {
+      const relevance = relevanceScore(product, profile);
+      const confidence = confidenceScore(product, profile);
+      const enriched = {
+        ...product,
+        relevance,
+        confidence,
+        score: scoreProduct(product, preferences) + relevance + Math.round(confidence / 5)
+      };
+      return {
+        ...enriched,
+        reasons: explainChoice(enriched, language)
+      };
+    })
+    .filter((product) => requiresRelevantMatch ? product.relevance > 0 && product.confidence >= minimumConfidence : product.relevance > -18)
     .sort((a, b) => b.score - a.score);
 
   return uniqueRankedProducts(ranked).slice(0, 3);
 }
 
-module.exports = { normalizeProducts, pickTopProducts, scoreProduct };
+module.exports = { normalizeProducts, pickTopProducts, scoreProduct, relevanceScore, confidenceScore };

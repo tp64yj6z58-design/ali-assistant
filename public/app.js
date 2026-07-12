@@ -4,6 +4,24 @@ const results = document.querySelector("#results");
 const statusEl = document.querySelector("#status");
 const exampleButtons = document.querySelectorAll("[data-query]");
 
+let lastQuery = "";
+let loadingTimer = null;
+
+const loadingSteps = {
+  he: [
+    "מנתח את הבקשה ומזהה איזה מוצר באמת מחפשים...",
+    "סורק כמה ניסוחי חיפוש באלי אקספרס...",
+    "מסנן אביזרים ומוצרים לא קשורים...",
+    "מדרג לפי התאמה, מחיר, דירוג וכמות הזמנות..."
+  ],
+  en: [
+    "Understanding the exact product intent...",
+    "Scanning multiple AliExpress search angles...",
+    "Filtering accessories and unrelated items...",
+    "Ranking by fit, price, rating and order volume..."
+  ]
+};
+
 async function loadStatus() {
   try {
     const response = await fetch("/api/health");
@@ -17,6 +35,10 @@ async function loadStatus() {
   }
 }
 
+function detectLanguage(value) {
+  return /[\u0590-\u05ff]/.test(String(value || "")) ? "he" : "en";
+}
+
 function money(product, language) {
   if (!product.price) return language === "en" ? "Price unavailable" : "מחיר לא זמין";
   return `${product.price} ${product.currency || ""}`.trim();
@@ -26,21 +48,25 @@ function labels(language) {
   return language === "en"
     ? {
         score: "Score",
+        fit: "Fit",
         rating: "Rating",
         orders: "orders",
         open: "Open product",
         good: "Good match",
         bad: "Not relevant",
-        noResults: "I did not find products strong enough. Try a more specific search."
+        noResults: "I did not find products strong enough. Try a more specific search.",
+        improve: "Try one of these sharper searches:"
       }
     : {
         score: "ציון",
+        fit: "התאמה",
         rating: "דירוג",
         orders: "הזמנות",
         open: "פתח מוצר",
         good: "מתאים",
         bad: "לא מתאים",
-        noResults: "לא נמצאו מוצרים מספיק טובים. נסה ניסוח אחר."
+        noResults: "לא מצאתי מוצרים מספיק מדויקים כדי להמליץ עליהם.",
+        improve: "אפשר לדייק את החיפוש כך:"
       };
 }
 
@@ -64,14 +90,25 @@ function renderProducts(data) {
   }
 
   if (!data.products.length) {
-    results.innerHTML = `<div class="empty">${escapeHtml(data.assistantSummary || ui.noResults)}</div>`;
+    results.innerHTML = `
+      <div class="empty" dir="${data.language === "en" ? "ltr" : "rtl"}">
+        <strong>${escapeHtml(data.assistantSummary || ui.noResults)}</strong>
+        ${renderRefinements(data.refinementOptions, ui)}
+      </div>
+    `;
+    bindQueryButtons(results.querySelectorAll("[data-query]"));
     return;
   }
 
   const summary = `
     <div class="assistantNote" dir="${data.language === "en" ? "ltr" : "rtl"}">
       <div class="assistantBadge">AI</div>
-      <p>${escapeHtml(data.assistantSummary || "")}</p>
+      <div>
+        <p>${escapeHtml(data.assistantSummary || "")}</p>
+        <div class="confidenceBar" aria-label="${ui.fit} ${data.confidence || 0}%">
+          <span style="width:${Math.max(8, Math.min(100, data.confidence || 0))}%"></span>
+        </div>
+      </div>
     </div>
   `;
 
@@ -84,6 +121,7 @@ function renderProducts(data) {
       <h2 dir="auto">${escapeHtml(product.title)}</h2>
       <div class="meta">
         <span class="pill">${escapeHtml(money(product, data.language))}</span>
+        <span class="pill">${ui.fit} ${product.confidence || data.confidence || 0}%</span>
         <span class="pill">${ui.score} ${product.score}</span>
         ${product.rating ? `<span class="pill">${ui.rating} ${product.rating}</span>` : ""}
         ${product.orders ? `<span class="pill">${Number(product.orders).toLocaleString(data.language === "en" ? "en-US" : "he-IL")} ${ui.orders}</span>` : ""}
@@ -91,7 +129,7 @@ function renderProducts(data) {
       <ul class="reasons">
         ${product.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}
       </ul>
-      <div class="feedback" data-product-id="${escapeAttribute(product.id || product.title)}">
+      <div class="feedback" data-product-id="${escapeAttribute(product.id || product.title)}" data-title="${escapeAttribute(product.title)}" data-url="${escapeAttribute(product.productUrl)}">
         <button type="button" data-feedback="good">${ui.good}</button>
         <button type="button" data-feedback="bad">${ui.bad}</button>
       </div>
@@ -100,6 +138,16 @@ function renderProducts(data) {
   `).join("");
 
   bindFeedback();
+}
+
+function renderRefinements(options = [], ui) {
+  if (!options.length) return "";
+  return `
+    <p>${ui.improve}</p>
+    <div class="clarifyOptions">
+      ${options.map((option) => `<button type="button" data-query="${escapeAttribute(option)}">${escapeHtml(option)}</button>`).join("")}
+    </div>
+  `;
 }
 
 function escapeHtml(value) {
@@ -123,10 +171,12 @@ form.addEventListener("submit", async (event) => {
 
 async function search(query) {
   if (!query) return;
+  lastQuery = query;
   input.value = query;
+  const language = detectLanguage(query);
   const button = form.querySelector("button");
   button.disabled = true;
-  results.innerHTML = `<div class="loading">סורק מוצרים, משווה נתונים ובוחר את האפשרויות הכי חזקות...</div>`;
+  showLoading(language);
   focusResults();
 
   try {
@@ -137,15 +187,43 @@ async function search(query) {
     });
     const text = await response.text();
     const data = text ? JSON.parse(text) : {};
-    if (!response.ok) throw new Error(data.error || "החיפוש נכשל");
+    if (!response.ok) throw new Error(data.error || (language === "en" ? "Search failed" : "החיפוש נכשל"));
     renderProducts(data);
     focusResults();
   } catch (error) {
     results.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
     focusResults();
   } finally {
+    clearLoading();
     button.disabled = false;
   }
+}
+
+function showLoading(language) {
+  clearLoading();
+  const steps = loadingSteps[language] || loadingSteps.he;
+  let index = 0;
+  results.innerHTML = renderLoading(steps, index);
+  loadingTimer = setInterval(() => {
+    index = Math.min(index + 1, steps.length - 1);
+    results.innerHTML = renderLoading(steps, index);
+  }, 850);
+}
+
+function renderLoading(steps, activeIndex) {
+  return `
+    <div class="loading">
+      <div class="assistantBadge">AI</div>
+      <div class="loadingSteps">
+        ${steps.map((step, index) => `<span class="${index <= activeIndex ? "active" : ""}">${escapeHtml(step)}</span>`).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function clearLoading() {
+  if (loadingTimer) clearInterval(loadingTimer);
+  loadingTimer = null;
 }
 
 function focusResults() {
@@ -160,10 +238,26 @@ function bindQueryButtons(buttons) {
 
 function bindFeedback() {
   results.querySelectorAll("[data-feedback]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const box = button.closest(".feedback");
       box.querySelectorAll("button").forEach((item) => item.classList.remove("selected"));
       button.classList.add("selected");
+
+      try {
+        await fetch("/api/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: lastQuery,
+            productId: box.dataset.productId,
+            title: box.dataset.title,
+            url: box.dataset.url,
+            feedback: button.dataset.feedback
+          })
+        });
+      } catch {
+        // Feedback is helpful, but it should never block the shopper.
+      }
     });
   });
 }
