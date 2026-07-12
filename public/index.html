@@ -3,55 +3,156 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ali Assistant</title>
+    <title>AliExpress AI Agent</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
     <main class="app">
-      <section class="workspace">
-        <section class="hero panel">
-          <div class="heroContent">
-            <div class="brandMark">
-              <span>AI</span>
+      <div class="shell">
+        <header class="navbar" aria-label="ניווט ראשי">
+          <a class="brand" href="#home" aria-label="AliExpress AI Agent">
+            <span class="brandIcon" aria-hidden="true">◇</span>
+            <span>
+              <strong>AliExpress AI Agent</strong>
+              <small>העוזר החכם שלך לקניות באלי אקספרס</small>
+            </span>
+          </a>
+
+          <nav class="navLinks" aria-label="קישורי עמוד">
+            <a class="active" href="#home"><span aria-hidden="true">⌂</span>בית</a>
+            <a href="#how"><span aria-hidden="true">◌</span>איך זה עובד</a>
+            <a href="#categories"><span aria-hidden="true">▦</span>קטגוריות</a>
+            <a href="#contact"><span aria-hidden="true">◍</span>צור קשר</a>
+          </nav>
+
+          <a class="contactButton" href="#search">
+            <span aria-hidden="true">⌕</span>
+            חפש עכשיו
+          </a>
+        </header>
+
+        <section id="home" class="hero">
+          <div class="heroArt" aria-label="תצוגת מוצרים מומלצים">
+            <div class="orb orbLarge"></div>
+            <div class="orb orbSmall"></div>
+            <div class="showcase">
+              <div class="showcaseHeader">
+                <span class="spark">✧</span>
+                <span>AI-Powered Shopping</span>
+              </div>
+              <span class="aiBubble">AI</span>
+
+              <div class="showcaseCards">
+                <article class="miniProduct">
+                  <span class="discount">35%-</span>
+                  <div class="productVisual earbudsVisual" aria-hidden="true">
+                    <span></span><span></span>
+                  </div>
+                  <h3>אוזניות בלוטוס TWS</h3>
+                  <p><strong>$18.90</strong><del>$29.00</del></p>
+                  <small>★ 4.7 (2,156)</small>
+                </article>
+
+                <article class="miniProduct featuredMini">
+                  <span class="discount">50%-</span>
+                  <div class="productVisual watchVisual" aria-hidden="true">
+                    <span></span>
+                  </div>
+                  <h3>שעון חכם ספורט</h3>
+                  <p><strong>$29.99</strong><del>$59.99</del></p>
+                  <small>★ 4.6 (987)</small>
+                </article>
+
+                <article class="miniProduct">
+                  <span class="discount">42%-</span>
+                  <div class="productVisual holderVisual" aria-hidden="true">
+                    <span></span>
+                  </div>
+                  <h3>מטען אלחוטי לרכב</h3>
+                  <p><strong>$12.45</strong><del>$21.49</del></p>
+                  <small>★ 4.8 (1,327)</small>
+                </article>
+              </div>
+
+              <div class="sliderDots" aria-hidden="true">
+                <span class="active"></span>
+                <span></span>
+                <span></span>
+              </div>
             </div>
-            <p class="eyebrow">AliExpress AI Shopping Agent</p>
-            <h1>מצא את 3 המוצרים הכי שווים בלי לחפור באליאקספרס</h1>
-            <p class="summary">כתוב מה אתה מחפש. הסוכן בודק מוצרים דומים, מסנן תוצאות לא קשורות ומציג רק את האפשרויות הכי חזקות.</p>
+          </div>
+
+          <div class="heroContent">
+            <div class="eyebrow">
+              <span>✧</span>
+              עוזר שבודק בשבילך
+              <span>✧</span>
+            </div>
+            <h1>מצא את 3 המוצרים <span>הכי שווים</span> בלי לחפור באלי אקספרס</h1>
+            <p class="summary">
+              העוזר החכם שלנו סורק, משווה ומביא לך רק את ההצעות הכי טובות. חוסך זמן, כסף והתלבטויות.
+            </p>
             <div class="trustRow" aria-label="יתרונות">
-              <span>סינון מוצרים לא קשורים</span>
-              <span>מחיר + דירוג + הזמנות</span>
-              <span>בחירה מהירה יותר</span>
+              <span><b>⚡</b>מהיר וחכם</span>
+              <span><b>◈</b>מוצרים נבחרים</span>
+              <span><b>↻</b>עדכונים יומיים</span>
             </div>
             <div id="status" class="status">בודק חיבור...</div>
           </div>
-          <div class="heroPreview" aria-hidden="true">
-            <div class="heroImageCard">
-              <img src="/hero-shopping.jpg" alt="">
-            </div>
-            <div class="previewCard previewCardFloat">
-              <span class="miniBadge">AI</span>
-              <p>בודק, מסנן ומדרג לפני שאתה לוחץ.</p>
-            </div>
-          </div>
         </section>
 
-        <div class="panel search">
+        <section id="search" class="searchPanel">
           <form id="searchForm" class="searchForm">
-            <label for="query">מה הלקוח מחפש?</label>
+            <label for="query">מה אתה מחפש?</label>
             <div class="searchRow">
-              <input id="query" name="query" autocomplete="off" placeholder="לדוגמה: מטען מהיר לרכב עם USB-C" required>
-              <button type="submit">חפש</button>
+              <input id="query" name="query" autocomplete="off" placeholder="לדוגמה: מטען מהיר לרכב USB-C" required>
+              <button type="submit">
+                חפש עכשיו
+                <span aria-hidden="true">⌕</span>
+              </button>
             </div>
-            <div class="exampleChips" aria-label="דוגמאות חיפוש">
-              <button type="button" data-query="מטען לרכב">מטען לרכב</button>
-              <button type="button" data-query="אוזניות בלוטוס">אוזניות בלוטוס</button>
-              <button type="button" data-query="car charger">car charger</button>
+            <div class="popularWrap">
+              <strong>חיפושים פופולריים:</strong>
+              <div class="exampleChips" aria-label="דוגמאות חיפוש">
+                <button type="button" data-query="מטען לרכב"><span aria-hidden="true">▱</span>מטען לרכב</button>
+                <button type="button" data-query="אוזניות בלוטוס"><span aria-hidden="true">◉</span>אוזניות בלוטוס</button>
+                <button type="button" data-query="car charger"><span aria-hidden="true">⌕</span>car charger</button>
+                <button type="button" data-query="שעון חכם"><span aria-hidden="true">◇</span>שעון חכם</button>
+              </div>
             </div>
           </form>
-        </div>
+        </section>
 
-        <section id="results" class="results" aria-live="polite"></section>
-      </section>
+        <section id="features" class="features" aria-label="יתרונות המערכת">
+          <article class="featureCard">
+            <span class="featureIcon botIcon" aria-hidden="true">☷</span>
+            <h2>AI מתקדם</h2>
+            <p>הבנה חכמה של בקשת הלקוח וסריקה ממוקדת של מוצרים בשבילו.</p>
+          </article>
+          <article class="featureCard">
+            <span class="featureIcon tagIcon" aria-hidden="true">◇</span>
+            <h2>חיסכון מובטח</h2>
+            <p>אנחנו מציפים את האפשרויות המשתלמות ביותר לפי מחיר ונתונים.</p>
+          </article>
+          <article class="featureCard">
+            <span class="featureIcon shieldIcon" aria-hidden="true">◈</span>
+            <h2>מוצרים איכותיים</h2>
+            <p>רק מוצרים עם דירוג גבוה, תמונות ונתוני קנייה משמעותיים.</p>
+          </article>
+          <article class="featureCard">
+            <span class="featureIcon refreshIcon" aria-hidden="true">↻</span>
+            <h2>עדכונים יומיים</h2>
+            <p>תוצאות חדשות ורלוונטיות לפי המוצרים הזמינים כרגע.</p>
+          </article>
+        </section>
+
+        <section id="results" class="results" aria-live="polite" aria-label="תוצאות חיפוש"></section>
+
+        <footer id="contact" class="footer">
+          <span>AliExpress AI Agent</span>
+          <span>עוזר קניות חכם, מהיר ומדויק יותר.</span>
+        </footer>
+      </div>
     </main>
     <script src="/app.js"></script>
   </body>
