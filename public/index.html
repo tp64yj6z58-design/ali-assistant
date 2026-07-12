@@ -123,6 +123,86 @@
           </form>
         </section>
 
+        <section id="how" class="infoSection">
+          <div class="sectionHeading">
+            <span>איך זה עובד</span>
+            <h2>במקום לפתוח עשרות מוצרים, נותנים ל-AI לעשות את הסינון.</h2>
+            <p>המערכת לוקחת את מה שהלקוח כתב, מתרגמת את הכוונה למילות חיפוש מדויקות, בודקת נתוני מוצר ומחזירה רק אפשרויות שעומדות בסינון.</p>
+          </div>
+          <div class="processGrid">
+            <article class="processCard">
+              <span>1</span>
+              <h3>מבינים את הבקשה</h3>
+              <p>הבוט מזהה אם מחפשים מוצר, אביזר, דגם, שימוש או קטגוריה.</p>
+            </article>
+            <article class="processCard">
+              <span>2</span>
+              <h3>סורקים כמה ניסוחים</h3>
+              <p>לא מסתפקים במילת חיפוש אחת. המערכת מנסה וריאציות כדי להגיע לתוצאות מדויקות יותר.</p>
+            </article>
+            <article class="processCard">
+              <span>3</span>
+              <h3>מסננים רעש</h3>
+              <p>מוצרים לא קשורים, אביזרים לא מתאימים וכותרות מטעות מקבלים ניקוד נמוך או נפסלים.</p>
+            </article>
+            <article class="processCard">
+              <span>4</span>
+              <h3>מציגים 3 חזקים</h3>
+              <p>הבחירה מתבססת על רלוונטיות, מחיר, דירוג, הזמנות וזמינות נתונים.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="categories" class="categorySection">
+          <div class="sectionHeading">
+            <span>קטגוריות</span>
+            <h2>חיפושים מהירים לפי תחום</h2>
+            <p>כל כרטיס כאן מפעיל חיפוש אמיתי בבוט. זה נותן ללקוח התחלה מהירה בלי לנחש מה לכתוב.</p>
+          </div>
+          <div class="categoryGrid" aria-label="קטגוריות חיפוש">
+            <button type="button" data-query="מטען לרכב USB-C">
+              <span>▱</span>
+              <strong>רכב וגאדג'טים</strong>
+              <small>מטענים, מחזיקים, מצלמות דרך ואביזרי רכב.</small>
+            </button>
+            <button type="button" data-query="אוזניות בלוטוס">
+              <span>◉</span>
+              <strong>אלקטרוניקה</strong>
+              <small>אוזניות, שעונים חכמים, כבלים, מצלמות ומטענים.</small>
+            </button>
+            <button type="button" data-query="מגן מסך לאייפון">
+              <span>◇</span>
+              <strong>טלפון ואביזרים</strong>
+              <small>כיסויים, מגני מסך, מתאמים וציוד טעינה.</small>
+            </button>
+            <button type="button" data-query="צעצוע לכלב">
+              <span>◌</span>
+              <strong>חיות מחמד</strong>
+              <small>צעצועים, מיטות, קערות ואביזרים לכלב ולחתול.</small>
+            </button>
+            <button type="button" data-query="ארנק לגבר">
+              <span>▦</span>
+              <strong>אופנה</strong>
+              <small>ארנקים, חגורות, תיקים, שעונים ואקססוריז.</small>
+            </button>
+            <button type="button" data-query="מנורת לילה">
+              <span>✧</span>
+              <strong>בית וחיים</strong>
+              <small>תאורה, ארגון, שטיחים, כריות ומוצרים לבית.</small>
+            </button>
+            <button type="button" data-query="פנס ראש">
+              <span>↗</span>
+              <strong>ספורט וטיולים</strong>
+              <small>ציוד קמפינג, פנסים, בקבוקים ואביזרי שטח.</small>
+            </button>
+            <button type="button" data-query="צעצוע לתינוק">
+              <span>☷</span>
+              <strong>תינוקות וילדים</strong>
+              <small>צעצועים, עגלות, מנשאים ומוצרים שימושיים להורים.</small>
+            </button>
+          </div>
+        </section>
+
         <section id="features" class="features" aria-label="יתרונות המערכת">
           <article class="featureCard">
             <span class="featureIcon botIcon" aria-hidden="true">☷</span>
@@ -148,7 +228,16 @@
 
         <section id="results" class="results" aria-live="polite" aria-label="תוצאות חיפוש"></section>
 
-        <footer id="contact" class="footer">
+        <section id="contact" class="contactSection">
+          <div>
+            <span>צור קשר</span>
+            <h2>רוצה שנוסיף קטגוריה או נדייק מוצר שחוזר לא נכון?</h2>
+            <p>המנוע נבנה להשתפר כל הזמן. כל חיפוש שלא פגע בול הופך אצלנו להזדמנות לחזק את המערכת.</p>
+          </div>
+          <a href="#search">בדוק מוצר עכשיו</a>
+        </section>
+
+        <footer class="footer">
           <span>AliExpress AI Agent</span>
           <span>עוזר קניות חכם, מהיר ומדויק יותר.</span>
         </footer>

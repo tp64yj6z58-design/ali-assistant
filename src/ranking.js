@@ -33,11 +33,16 @@ function normalizeProducts(rawProducts) {
 }
 
 function termAppears(title, term) {
+  const normalizedTitle = String(title)
+    .toLowerCase()
+    .replace(/powerbank/g, "power bank")
+    .replace(/screenprotector/g, "screen protector")
+    .replace(/watchband/g, "watch band");
   const words = String(term).toLowerCase().split(/\s+/).filter(Boolean);
   return words.every((word) => {
     const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const pattern = new RegExp(`(^|[^a-z0-9])${escaped}(s|es)?([^a-z0-9]|$)`, "i");
-    return pattern.test(title);
+    return pattern.test(normalizedTitle);
   });
 }
 
