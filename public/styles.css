@@ -254,6 +254,17 @@ button {
   animation: riseIn 520ms ease both;
 }
 
+.eyebrow,
+.trustRow,
+.status,
+.popularWrap {
+  display: none !important;
+}
+
+.toggleSection[hidden] {
+  display: none !important;
+}
+
 .eyebrow {
   margin-bottom: 24px;
   padding: 10px 20px;

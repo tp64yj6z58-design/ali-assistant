@@ -3,6 +3,8 @@ const input = document.querySelector("#query");
 const results = document.querySelector("#results");
 const statusEl = document.querySelector("#status");
 const exampleButtons = document.querySelectorAll("[data-query]");
+const navLinks = document.querySelectorAll(".navLinks a");
+const toggleSections = document.querySelectorAll(".toggleSection");
 
 let lastQuery = "";
 let loadingTimer = null;
@@ -23,6 +25,7 @@ const loadingSteps = {
 };
 
 async function loadStatus() {
+  if (!statusEl) return;
   try {
     const response = await fetch("/api/health");
     const health = await response.json();
@@ -34,6 +37,34 @@ async function loadStatus() {
     statusEl.textContent = "לא ניתן לבדוק חיבור כרגע";
   }
 }
+
+function setActivePanel(id) {
+  const normalizedId = ["how", "categories", "contact"].includes(id) ? id : "";
+
+  toggleSections.forEach((section) => {
+    const isOpen = section.id === normalizedId;
+    section.hidden = !isOpen;
+    section.classList.toggle("is-open", isOpen);
+  });
+
+  navLinks.forEach((link) => {
+    const target = link.getAttribute("href")?.replace("#", "") || "";
+    link.classList.toggle("active", target === (normalizedId || "home"));
+  });
+}
+
+navLinks.forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const id = link.getAttribute("href")?.replace("#", "") || "";
+    if (["how", "categories", "contact", "home"].includes(id)) {
+      event.preventDefault();
+      setActivePanel(id);
+      const target = id === "home" ? document.querySelector("#home") : document.querySelector(`#${id}`);
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.replaceState(null, "", id === "home" ? "#home" : `#${id}`);
+    }
+  });
+});
 
 function detectLanguage(value) {
   return /[\u0590-\u05ff]/.test(String(value || "")) ? "he" : "en";
@@ -256,4 +287,5 @@ function bindFeedback() {
 }
 
 bindQueryButtons(exampleButtons);
+setActivePanel(window.location.hash.replace("#", ""));
 loadStatus();
