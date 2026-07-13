@@ -7,8 +7,11 @@ const HEBREW_TERMS = new Map([
   ["\u05db\u05d1\u05dc", ["cable"]],
   ["\u05d8\u05e2\u05d9\u05e0\u05d4", ["charging"]],
   ["\u05d0\u05d9\u05d9\u05e4\u05d5\u05df", ["iphone"]],
+  ["\u05e1\u05de\u05e1\u05d5\u05e0\u05d2", ["samsung"]],
   ["\u05d2\u05dc\u05e7\u05e1\u05d9", ["samsung"]],
   ["\u05de\u05d2\u05df", ["case"]],
+  ["\u05de\u05e1\u05da", ["screen"]],
+  ["\u05d6\u05db\u05d5\u05db\u05d9\u05ea", ["glass"]],
   ["\u05db\u05d9\u05e1\u05d5\u05d9", ["cover", "case"]],
   ["\u05d0\u05d5\u05d6\u05e0\u05d9\u05d5\u05ea", ["earbuds", "headphones"]],
   ["\u05d1\u05dc\u05d5\u05d8\u05d5\u05e1", ["bluetooth"]],
@@ -62,7 +65,11 @@ const HEBREW_TERMS = new Map([
   ["\u05d0\u05d5\u05d4\u05dc", ["tent"]],
   ["\u05e7\u05de\u05e4\u05d9\u05e0\u05d2", ["camping"]],
   ["\u05e8\u05e6\u05d5\u05e2\u05d4", ["leash"]],
+  ["\u05e7\u05d5\u05dc\u05e8", ["collar"]],
   ["\u05db\u05dc\u05d1", ["dog"]],
+  ["\u05de\u05d9\u05d8\u05d4", ["bed"]],
+  ["\u05de\u05d9\u05d8\u05ea", ["bed"]],
+  ["\u05e7\u05e2\u05e8\u05d4", ["bowl"]],
   ["\u05de\u05d6\u05e8\u05e7\u05ea", ["fountain"]],
   ["\u05d7\u05ea\u05d5\u05dc", ["cat"]],
   ["\u05e2\u05d2\u05dc\u05d4", ["stroller"]],
@@ -89,6 +96,8 @@ const HEBREW_TERMS = new Map([
   ["\u05de\u05e4\u05ea\u05d7\u05d5\u05ea", ["keys"]],
   ["\u05de\u05e4\u05ea\u05d5\u05d7\u05ea", ["keys"]],
   ["\u05e6\u05e8\u05d5\u05e8", ["keychain"]],
+  ["\u05d5\u05d9\u05dc\u05d5\u05df", ["curtain"]],
+  ["\u05d0\u05de\u05d1\u05d8\u05d9\u05d4", ["shower"]],
   ["ארנק", ["wallet"]],
   ["חגורה", ["belt"]],
   ["כובע", ["cap", "hat"]],
@@ -136,6 +145,16 @@ const HEBREW_TERMS = new Map([
 ]);
 
 const PHRASE_TERMS = [
+  {
+    pattern: /\u05db\u05d1\u05dc.*\u05d0\u05d9\u05d9\u05e4\u05d5\u05df|\u05db\u05d1\u05dc.*iphone|iphone.*cable/,
+    terms: ["iphone", "cable"],
+    exclude: ["organizer", "winder", "tie", "ties", "protector", "case", "cover", "holder", "charger only"]
+  },
+  {
+    pattern: /\u05db\u05d1\u05dc.*usb.*c|usb.*c.*\u05db\u05d1\u05dc|usb.*cable|type c.*cable/,
+    terms: ["usb", "cable"],
+    exclude: ["organizer", "winder", "tie", "ties", "protector", "case", "cover", "hub", "charger only", "adapter only"]
+  },
   {
     pattern: /\u05de\u05d7\u05d6\u05d9\u05e7.*\u05de\u05e4\u05ea\u05d7|\u05de\u05d7\u05d6\u05d9\u05e7.*\u05de\u05e4\u05ea\u05d5\u05d7\u05ea|\u05e6\u05e8\u05d5\u05e8.*\u05de\u05e4\u05ea\u05d7/,
     terms: ["keychain"],
@@ -198,7 +217,12 @@ const PHRASE_TERMS = [
   {
     pattern: /מיטה.*כלב/,
     terms: ["dog", "bed"],
-    exclude: ["toy", "blanket only", "cover only", "mat only"]
+    exclude: ["toy", "blanket only", "cover only", "mat only", "bed bug", "uv", "flashlight", "urine detector", "hair remover", "brush", "furniture"]
+  },
+  {
+    pattern: /\u05e7\u05d5\u05dc\u05e8.*\u05db\u05dc\u05d1|dog.*collar/,
+    terms: ["dog", "collar"],
+    exclude: ["toy", "bed", "bowl", "leash only", "harness only", "workbench", "woodworking", "clamp"]
   },
   {
     pattern: /קערה.*כלב/,
@@ -219,6 +243,11 @@ const PHRASE_TERMS = [
     pattern: /משאבת.*אוויר|משאבה.*אוויר/,
     terms: ["air", "pump"],
     exclude: ["aquarium", "water pump", "bottle", "soap"]
+  },
+  {
+    pattern: /\u05de\u05e9\u05d0\u05d1\u05ea.*\u05d0\u05d5\u05d5\u05d9\u05e8.*\u05e8\u05db\u05d1|\u05de\u05e9\u05d0\u05d1\u05d4.*\u05d0\u05d5\u05d5\u05d9\u05e8.*\u05e8\u05db\u05d1|\u05e7\u05d5\u05de\u05e4\u05e8\u05e1\u05d5\u05e8.*\u05e8\u05db\u05d1/,
+    terms: ["car", "tire", "inflator"],
+    exclude: ["aquarium", "water pump", "soap", "blower", "dust blower", "camera lens", "filament", "bicycle", "bike", "wedge", "airbag", "chuck", "connector", "adapter", "case", "cover", "bag", "hose", "tube", "tubes", "pressure gauge", "repair tool", "pressure gun"]
   },
   {
     pattern: /פנס.*ראש/,
@@ -322,7 +351,7 @@ const PHRASE_TERMS = [
   },
   {
     pattern: /\u05de\u05e7\u05e8\u05df.*\u05e0\u05d9\u05d9\u05d3/,
-    terms: ["portable", "projector"],
+    terms: ["projector"],
     exclude: ["screen", "remote", "case", "stand", "holder"]
   },
   {
@@ -409,6 +438,11 @@ const PHRASE_TERMS = [
     pattern: /\u05de\u05dc\u05d7\u05dd/,
     terms: ["electric", "soldering", "iron"],
     exclude: ["tip", "tips", "cleaner", "paste", "refresher", "ball", "mesh"]
+  },
+  {
+    pattern: /\u05d5\u05d9\u05dc\u05d5\u05df.*\u05d0\u05de\u05d1\u05d8\u05d9\u05d4/,
+    terms: ["shower", "curtain"],
+    exclude: ["clip", "clips", "holder", "tie back", "car", "window", "sun shade", "skirt", "hair scarf", "hook", "hooks", "ring", "rings", "rod", "bracket", "party", "backdrop", "photo", "foil", "tinsel"]
   }
 ];
 
@@ -456,6 +490,13 @@ const ENGLISH_TERMS = new Map([
   ["headphones", ["headphones", "earbuds"]],
   ["watch", ["watch"]],
   ["charger", ["charger"]],
+  ["cable", ["cable"]],
+  ["collar", ["collar"]],
+  ["shower", ["shower"]],
+  ["tire", ["tire"]],
+  ["tyre", ["tire"]],
+  ["inflator", ["inflator"]],
+  ["compressor", ["compressor"]],
   ["camera", ["camera"]],
   ["bottle", ["bottle"]],
   ["speaker", ["speaker"]],
@@ -561,7 +602,7 @@ function buildSearchProfile(input) {
     const mapped = lookupHebrewTerm(token);
     if (mapped) {
       translated.push(...mapped);
-      if (!phraseMatched) required.push(mapped[0]);
+      if (!phraseMatched || ["iphone", "samsung"].includes(mapped[0])) required.push(mapped[0]);
       continue;
     }
 
@@ -599,6 +640,10 @@ function addCategoryExclusions(requiredTerms, excluded) {
     excluded.push("patch", "badge", "sticker", "strap", "harness", "buckle", "clip", "zipper", "pull", "extender", "replacement", "luggage", "purse", "handbag", "jacket", "keychain", "keychains", "webbing", "reflective tag", "rain cover", "dust cover");
   }
 
+  if (has("laptop") && has("bag")) {
+    excluded.push("umbrella", "sun protection", "shield", "stand", "cooling pad", "keyboard", "skin", "sticker");
+  }
+
   if (has("watch") && has("smart")) {
     excluded.push("band", "strap", "bracelet", "case", "cover", "protector", "screen protector", "charger", "charging", "cable", "accessories", "replacement");
   }
@@ -609,6 +654,10 @@ function addCategoryExclusions(requiredTerms, excluded) {
 
   if (has("charger") && !has("cable")) {
     excluded.push("cable", "cord", "wire", "connector", "connectors", "data transfer", "plate", "sticker", "holder");
+  }
+
+  if (has("cable")) {
+    excluded.push("organizer", "winder", "management", "tie", "ties", "protector", "case", "cover", "holder", "clip", "clips", "charger only", "adapter only", "hub only");
   }
 
   if (has("earbuds") || has("headphones")) {
@@ -643,7 +692,7 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("projector")) {
-    excluded.push("screen", "remote", "case", "stand", "holder", "party light", "disco", "laser", "stroboscopic", "light show");
+    excluded.push("screen", "remote", "case", "stand", "holder", "party light", "disco", "laser", "stroboscopic", "light show", "drawing board", "tracing board", "optical drawing", "painting board", "art board");
   }
 
   if (has("vacuum") && has("car")) {
@@ -655,7 +704,7 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("security") && has("camera")) {
-    excluded.push("connector", "adapter", "socket", "plug", "cable", "bracket", "mount", "power connector", "jack");
+    excluded.push("connector", "adapter", "socket", "plug", "cable", "bracket", "mount", "power connector", "jack", "solar charger", "battery charger", "battery pack");
   }
 
   if (has("air") && has("fryer")) {
@@ -731,7 +780,7 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if ((has("iphone") || has("samsung")) && has("case")) {
-    excluded.push("screen protector", "glass", "charger", "cable", "strap", "holder", "ring holder", "lens protector");
+    excluded.push("screen protector", "glass", "charger", "cable", "strap", "holder", "ring holder", "lens protector", "cleaner", "cleaning", "earphones", "earbuds", "airpods", "headsets", "tools");
   }
 
   if (has("watch") && has("band")) {
@@ -759,7 +808,7 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("wallet")) {
-    excluded.push("sanitary", "napkin", "earphone", "charging cable", "cable storage", "storage bag", "organizer bag", "lipstick", "zero wallet", "hook", "hanger", "hanging decor", "wall hanger", "bracket", "office supplies");
+    excluded.push("sanitary", "napkin", "earphone", "charging cable", "cable storage", "storage bag", "organizer bag", "lipstick", "zero wallet", "hook", "hanger", "hanging decor", "wall hanger", "bracket", "office supplies", "tracker", "tag", "find my", "bluetooth tracker", "lost item", "airtag");
   }
 
   if (has("rug")) {
@@ -771,7 +820,11 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("dog") && has("bed")) {
-    excluded.push("toy", "collar", "leash", "bowl", "blanket only", "cover only");
+    excluded.push("toy", "collar", "leash", "bowl", "blanket only", "cover only", "bed bug", "uv", "flashlight", "urine detector", "hair remover", "brush", "furniture", "stairs", "steps", "ladder", "ramp");
+  }
+
+  if (has("dog") && has("collar")) {
+    excluded.push("toy", "bed", "bowl", "workbench", "woodworking", "clamp", "leash only", "harness only", "airtag case", "gps finder", "tracker case", "protective case");
   }
 
   if (has("baby") && has("toy")) {
@@ -780,10 +833,21 @@ function addCategoryExclusions(requiredTerms, excluded) {
 
   if (has("air") && has("pump")) {
     excluded.push("aquarium", "water pump", "soap dispenser", "sprayer", "bottle");
+    if (has("car")) {
+      excluded.push("dust blower", "blower", "camera lens", "filament", "bicycle only", "bike only", "wedge", "airbag", "chuck", "adapter", "connector", "case", "cover", "bag", "hose", "tube", "tubes", "pressure gauge", "repair tool", "pressure gun");
+    }
+  }
+
+  if (has("car") && has("tire") && has("inflator")) {
+    excluded.push("aquarium", "water pump", "soap dispenser", "sprayer", "bottle", "dust blower", "blower", "camera lens", "filament", "bicycle", "bike", "wedge", "airbag", "chuck", "adapter", "connector", "case", "cover", "bag", "hose", "tube", "tubes", "hose only", "valve only", "pressure gauge", "repair tool", "pressure gun");
+  }
+
+  if (has("shower") && has("curtain")) {
+    excluded.push("clip", "clips", "holder", "tie back", "car", "window", "sun shade", "skirt", "hair scarf", "hook", "hooks", "ring", "rings", "rod", "bracket", "party", "backdrop", "photo", "foil", "tinsel");
   }
 
   if (has("headlamp")) {
-    excluded.push("strap only", "bicycle tail light", "lamp holder", "clip");
+    excluded.push("strap only", "bicycle tail light", "lamp holder", "clip", "headlight", "headlights", "car", "restoration", "polish", "oxidation", "scratch remover");
   }
 
   if (has("night") && has("light")) {
@@ -797,12 +861,16 @@ function buildSearchKeywords(input) {
 
 const SEARCH_VARIANTS = [
   { terms: ["keychain"], queries: ["keychain", "key ring", "metal keychain", "car keychain", "cute keychain"] },
+  { terms: ["iphone", "cable"], queries: ["iphone charging cable", "iphone usb cable", "lightning cable", "iphone fast charging cable"] },
+  { terms: ["usb", "cable"], queries: ["usb c cable", "type c cable", "usb charging cable", "usb data cable"] },
   { terms: ["wallet"], queries: ["wallet", "men wallet", "women wallet", "card holder wallet", "leather wallet"] },
   { terms: ["belt"], queries: ["belt", "men belt", "women belt", "leather belt", "automatic buckle belt"] },
   { terms: ["socks"], queries: ["socks", "cotton socks", "sport socks", "men socks", "women socks"] },
   { terms: ["cap"], queries: ["baseball cap", "sun hat", "men cap", "women cap", "summer hat"] },
   { terms: ["suitcase"], queries: ["suitcase", "travel suitcase", "rolling luggage", "carry on suitcase"] },
   { terms: ["power", "bank"], queries: ["10000mah power bank", "20000mah power bank", "portable power bank", "fast charging power bank", "usb c power bank", "external battery power bank"] },
+  { terms: ["samsung", "screen", "protector"], queries: ["samsung screen protector", "samsung tempered glass", "galaxy screen protector", "samsung galaxy tempered glass"] },
+  { terms: ["iphone", "screen", "protector"], queries: ["iphone screen protector", "iphone tempered glass", "iphone protective glass", "iphone privacy screen protector"] },
   { terms: ["screen", "protector"], queries: ["screen protector", "tempered glass screen protector", "iphone screen protector", "samsung screen protector"] },
   { terms: ["iphone", "case"], queries: ["iphone case", "magsafe iphone case", "shockproof iphone case", "clear iphone case"] },
   { terms: ["samsung", "case"], queries: ["samsung case", "galaxy case", "shockproof samsung case", "clear samsung case"] },
@@ -814,15 +882,19 @@ const SEARCH_VARIANTS = [
   { terms: ["dog", "toy"], queries: ["dog toy", "interactive dog toy", "chew dog toy", "pet dog toy"] },
   { terms: ["dog", "bed"], queries: ["dog bed", "pet dog bed", "washable dog bed", "soft dog bed"] },
   { terms: ["dog", "bowl"], queries: ["dog bowl", "pet feeding bowl", "dog water bowl", "stainless dog bowl"] },
+  { terms: ["dog", "collar"], queries: ["dog collar", "adjustable dog collar", "pet dog collar", "reflective dog collar"] },
   { terms: ["baby", "toy"], queries: ["baby toy", "infant toy", "educational baby toy", "soft baby toy"] },
   { terms: ["blood", "pressure", "monitor"], queries: ["blood pressure monitor", "digital blood pressure monitor", "arm blood pressure monitor"] },
   { terms: ["air", "pump"], queries: ["air pump", "portable air pump", "tire inflator", "electric air pump"] },
+  { terms: ["car", "tire", "inflator"], queries: ["car tire inflator", "portable car tire inflator", "car air compressor tire inflator", "electric tire inflator car"] },
+  { terms: ["car", "air", "pump"], queries: ["car tire inflator", "portable car air pump", "car air compressor", "electric tire pump"] },
   { terms: ["headlamp"], queries: ["headlamp", "led headlamp", "rechargeable headlamp", "head flashlight"] },
   { terms: ["night", "light"], queries: ["night light", "led night light", "bedside night light", "kids night light"] },
   { terms: ["rug"], queries: ["rug", "area rug", "living room rug", "bedroom rug"] },
   { terms: ["pillow"], queries: ["pillow", "memory foam pillow", "neck pillow", "sleep pillow"] },
   { terms: ["blanket"], queries: ["blanket", "soft blanket", "throw blanket", "warm blanket"] },
   { terms: ["curtain"], queries: ["curtain", "blackout curtain", "window curtain", "shower curtain"] },
+  { terms: ["shower", "curtain"], queries: ["shower curtain", "bathroom shower curtain", "waterproof shower curtain", "bath curtain"] },
   { terms: ["organizer"], queries: ["storage organizer", "desk organizer", "closet organizer", "drawer organizer"] },
   { terms: ["cordless", "drill"], queries: ["cordless screwdriver", "electric screwdriver", "cordless drill", "rechargeable drill", "power drill"] },
   { terms: ["car", "charger"], queries: ["car charger", "usb c car charger", "fast car charger", "pd car charger", "car cigarette lighter charger", "multi port car charger"] },
