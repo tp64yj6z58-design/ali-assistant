@@ -177,7 +177,6 @@ async function search(query) {
   const button = form.querySelector("button");
   button.disabled = true;
   showLoading(language);
-  focusResults();
 
   try {
     const response = await fetch("/api/recommend", {
@@ -189,10 +188,8 @@ async function search(query) {
     const data = text ? JSON.parse(text) : {};
     if (!response.ok) throw new Error(data.error || (language === "en" ? "Search failed" : "החיפוש נכשל"));
     renderProducts(data);
-    focusResults();
   } catch (error) {
     results.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
-    focusResults();
   } finally {
     clearLoading();
     button.disabled = false;
@@ -224,10 +221,6 @@ function renderLoading(steps, activeIndex) {
 function clearLoading() {
   if (loadingTimer) clearInterval(loadingTimer);
   loadingTimer = null;
-}
-
-function focusResults() {
-  results.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function bindQueryButtons(buttons) {
