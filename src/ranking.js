@@ -162,10 +162,11 @@ function pickTopProducts(rawProducts, preferences, profile = {}, language = "he"
         reasons: explainChoice(enriched, language)
       };
     })
-    .filter((product) => requiresRelevantMatch ? product.relevance > 0 && product.confidence >= minimumConfidence : product.relevance > -18)
     .sort((a, b) => b.score - a.score);
 
-  return uniqueRankedProducts(ranked).slice(0, 3);
+  const strict = ranked.filter((product) => requiresRelevantMatch ? product.relevance > 0 && product.confidence >= minimumConfidence : product.relevance > -18);
+  const backfill = ranked.filter((product) => requiresRelevantMatch ? product.relevance > 0 && product.confidence >= 42 : product.relevance > -18);
+  return uniqueRankedProducts([...strict, ...backfill]).slice(0, 3);
 }
 
 module.exports = { normalizeProducts, pickTopProducts, scoreProduct, relevanceScore, confidenceScore };

@@ -72,6 +72,7 @@ const HEBREW_TERMS = new Map([
   ["\u05e7\u05e2\u05e8\u05d4", ["bowl"]],
   ["\u05de\u05d6\u05e8\u05e7\u05ea", ["fountain"]],
   ["\u05d7\u05ea\u05d5\u05dc", ["cat"]],
+  ["\u05d1\u05d5\u05d1\u05d4", ["plush", "doll", "toy"]],
   ["\u05e2\u05d2\u05dc\u05d4", ["stroller"]],
   ["\u05ea\u05d9\u05e0\u05d5\u05e7", ["baby"]],
   ["\u05e4\u05e0\u05e1", ["light"]],
@@ -223,6 +224,11 @@ const PHRASE_TERMS = [
     pattern: /\u05e7\u05d5\u05dc\u05e8.*\u05db\u05dc\u05d1|dog.*collar/,
     terms: ["dog", "collar"],
     exclude: ["toy", "bed", "bowl", "leash only", "harness only", "workbench", "woodworking", "clamp"]
+  },
+  {
+    pattern: /\u05d1\u05d5\u05d1\u05d4.*\u05d7\u05ea\u05d5\u05dc|\u05d7\u05ea\u05d5\u05dc.*\u05d1\u05d5\u05d1\u05d4|cat.*doll|cat.*plush|kitty.*plush/,
+    terms: ["cat", "plush"],
+    exclude: ["sticker", "stickers", "decal", "decals", "patch", "badge", "poster", "print", "phone case", "keychain", "charm", "pendant", "wall art"]
   },
   {
     pattern: /קערה.*כלב/,
@@ -535,6 +541,9 @@ const ENGLISH_TERMS = new Map([
   ["adapter", ["adapter"]],
   ["remote", ["remote"]],
   ["toy", ["toy"]],
+  ["plush", ["plush"]],
+  ["doll", ["doll"]],
+  ["kitty", ["cat"]],
   ["bed", ["bed"]],
   ["bowl", ["bowl"]],
   ["rug", ["rug"]],
@@ -721,6 +730,10 @@ function addCategoryExclusions(requiredTerms, excluded) {
 
   if (has("cat") && has("water") && has("fountain")) {
     excluded.push("filter", "replacement", "sponge", "foam");
+  }
+
+  if (has("cat") && has("plush")) {
+    excluded.push("sticker", "stickers", "decal", "decals", "patch", "badge", "poster", "print", "phone case", "keychain", "charm", "pendant", "wall art", "stationery", "notebook", "card");
   }
 
   if (has("baby") && has("stroller")) {
@@ -917,6 +930,7 @@ const SEARCH_VARIANTS = [
   { terms: ["coffee", "grinder"], queries: ["coffee grinder", "electric coffee grinder", "coffee bean grinder", "manual coffee grinder"] },
   { terms: ["soldering", "iron"], queries: ["soldering iron", "electric soldering iron", "temperature soldering iron", "usb soldering iron"] },
   { terms: ["humidifier"], queries: ["humidifier", "air humidifier", "portable humidifier", "ultrasonic humidifier"] },
+  { terms: ["cat", "plush"], queries: ["cat plush toy", "kitty plush doll", "cat stuffed animal", "cute cat plush"] },
   { terms: ["cat", "water", "fountain"], queries: ["cat water fountain", "pet water fountain", "cat drinking fountain"] },
   { terms: ["bicycle", "light"], queries: ["bicycle light", "bike front light", "rechargeable bike light"] },
   { terms: ["motorcycle", "gloves"], queries: ["motorcycle gloves", "riding gloves", "motorbike gloves"] },

@@ -21,6 +21,7 @@ const CASES = [
   { query: "שטיח לסלון", expectAny: ["rug", "carpet"], avoid: ["tape", "gripper", "pad only"] },
   { query: "מדחום לתינוק", expectAny: ["thermometer"], avoid: ["toy", "sticker"] },
   { query: "משחק לתינוק", must: ["baby"], expectAny: ["toy"], avoid: ["stroller", "bottle"] },
+  { query: "בובה של חתול", must: ["cat"], expectAny: ["plush", "doll", "stuffed"], avoid: ["sticker", "decal", "patch", "poster", "keychain"] },
   { query: "iphone charger cable", expectAny: ["cable", "cord", "lightning", "usb"], avoid: ["case", "cover"] },
   { query: "samsung screen protector", must: ["screen"], expectAny: ["protector", "glass"], avoid: ["case", "cover"] },
   { query: "dog collar", must: ["dog"], expectAny: ["collar"], avoid: ["toy", "bed"] },

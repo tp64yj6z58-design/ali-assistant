@@ -1,21 +1,21 @@
 :root {
   color-scheme: light;
-  --bg: #fafafa;
-  --surface: rgba(255, 255, 255, 0.82);
+  --bg: #f7f8fa;
+  --surface: rgba(255, 255, 255, 0.9);
   --surface-solid: #ffffff;
-  --ink: #111827;
-  --muted: #6b7280;
-  --soft: #f6f3ff;
+  --ink: #11151c;
+  --muted: #667085;
+  --soft: #f4f6f8;
   --line: rgba(17, 24, 39, 0.08);
-  --primary: #7c3aed;
-  --secondary: #ec4899;
-  --accent: #6366f1;
+  --primary: #2563eb;
+  --secondary: #0f172a;
+  --accent: #14b8a6;
   --blue: #2563eb;
   --green: #10b981;
   --orange: #fb923c;
-  --shadow: 0 24px 70px rgba(79, 70, 229, 0.12);
+  --shadow: 0 22px 60px rgba(15, 23, 42, 0.1);
   --shadow-soft: 0 14px 34px rgba(17, 24, 39, 0.08);
-  --gradient: linear-gradient(135deg, #7c3aed 0%, #6366f1 44%, #ec4899 100%);
+  --gradient: linear-gradient(135deg, #2563eb 0%, #0f766e 100%);
   --font-apple: "Arial Hebrew", "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -36,10 +36,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background:
-    radial-gradient(circle at 10% 22%, rgba(124, 58, 237, 0.14), transparent 28%),
-    radial-gradient(circle at 88% 18%, rgba(236, 72, 153, 0.12), transparent 24%),
-    linear-gradient(180deg, #ffffff 0%, #f8f9ff 45%, #fafafa 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 52%, #f2f4f7 100%);
   color: var(--ink);
 }
 
@@ -70,34 +67,9 @@ button {
   position: relative;
 }
 
-.shell::before,
-.shell::after {
-  content: "";
-  position: fixed;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.shell::before {
-  inset: 120px auto auto 4%;
-  width: 290px;
-  height: 290px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(236, 72, 153, 0.05));
-  filter: blur(10px);
-}
-
-.shell::after {
-  inset: auto 0 80px auto;
-  width: 420px;
-  height: 420px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.1), transparent 66%);
-}
-
 .navbar {
-  position: sticky;
-  top: 14px;
+  position: relative;
+  top: auto;
   z-index: 20;
   min-height: 88px;
   padding: 18px 28px;
@@ -105,11 +77,11 @@ button {
   grid-template-columns: minmax(260px, 1fr) auto minmax(160px, 1fr);
   align-items: center;
   gap: 22px;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.94);
   border: 1px solid var(--line);
   border-radius: 18px;
   box-shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
-  backdrop-filter: blur(22px);
+  backdrop-filter: none;
 }
 
 .brand {
@@ -227,23 +199,11 @@ button {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background:
-    radial-gradient(circle at 16% 44%, rgba(124, 58, 237, 0.17), transparent 24%),
-    radial-gradient(circle at 72% 22%, rgba(236, 72, 153, 0.11), transparent 22%),
-    linear-gradient(135deg, #fbfbff 0%, #ffffff 48%, #fff7fb 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 }
 
 .hero::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 220px;
-  z-index: -1;
-  background:
-    radial-gradient(circle at 2px 2px, rgba(124, 58, 237, 0.12) 1px, transparent 1px) 0 0 / 18px 18px,
-    linear-gradient(120deg, transparent, rgba(124, 58, 237, 0.06));
-  opacity: 0.72;
-  mask-image: linear-gradient(to top, #000, transparent);
+  display: none;
 }
 
 .heroContent {
@@ -262,6 +222,11 @@ button {
 }
 
 .toggleSection[hidden] {
+  display: none !important;
+}
+
+.features,
+.sliderDots {
   display: none !important;
 }
 

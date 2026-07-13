@@ -117,6 +117,7 @@ function renderProducts(data) {
       </div>
     `;
     bindQueryButtons(results.querySelectorAll("[data-query]"));
+    scrollToResults();
     return;
   }
 
@@ -128,6 +129,7 @@ function renderProducts(data) {
       </div>
     `;
     bindQueryButtons(results.querySelectorAll("[data-query]"));
+    scrollToResults();
     return;
   }
 
@@ -169,6 +171,7 @@ function renderProducts(data) {
   `).join("");
 
   bindFeedback();
+  scrollToResults();
 }
 
 function renderRefinements(options = [], ui) {
@@ -208,6 +211,7 @@ async function search(query) {
   const button = form.querySelector("button");
   button.disabled = true;
   showLoading(language);
+  scrollToResults();
 
   try {
     const response = await fetch("/api/recommend", {
@@ -221,10 +225,15 @@ async function search(query) {
     renderProducts(data);
   } catch (error) {
     results.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
+    scrollToResults();
   } finally {
     clearLoading();
     button.disabled = false;
   }
+}
+
+function scrollToResults() {
+  results.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function showLoading(language) {
