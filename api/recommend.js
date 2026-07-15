@@ -1,6 +1,8 @@
 const { recommendProducts } = require("../src/assistant");
+const { applySecurityHeaders, enforceRateLimit, publicError, readJsonBody } = require("../src/httpUtils");
 
 module.exports = async function handler(req, res) {
+  applySecurityHeaders(res);
   res.setHeader("Cache-Control", "no-store");
 
   if (req.method !== "POST") {
@@ -9,32 +11,12 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    enforceRateLimit(req, "recommend");
     const body = await readJsonBody(req);
     const result = await recommendProducts(body.query);
     res.status(200).json(result);
   } catch (error) {
-    res.status(error.statusCode || 500).json({
-      error: error.message || "Unexpected error"
-    });
+    const { statusCode, message } = publicError(error);
+    res.status(statusCode).json({ error: message });
   }
 };
-
-function readJsonBody(req) {
-  if (req.body && typeof req.body === "object") return Promise.resolve(req.body);
-  if (typeof req.body === "string") return Promise.resolve(JSON.parse(req.body || "{}"));
-
-  return new Promise((resolve, reject) => {
-    let raw = "";
-    req.on("data", (chunk) => {
-      raw += chunk;
-    });
-    req.on("end", () => {
-      try {
-        resolve(raw ? JSON.parse(raw) : {});
-      } catch (error) {
-        reject(error);
-      }
-    });
-    req.on("error", reject);
-  });
-}

@@ -8,6 +8,8 @@ const toggleSections = document.querySelectorAll(".toggleSection");
 
 let lastQuery = "";
 let loadingTimer = null;
+let activeSearchId = 0;
+let activeSearchController = null;
 
 const loadingSteps = {
   he: [
@@ -205,30 +207,43 @@ form.addEventListener("submit", async (event) => {
 
 async function search(query) {
   if (!query) return;
+  const searchId = activeSearchId + 1;
+  activeSearchId = searchId;
+  if (activeSearchController) activeSearchController.abort();
+  activeSearchController = new AbortController();
   lastQuery = query;
   input.value = query;
   const language = detectLanguage(query);
   const button = form.querySelector("button");
   button.disabled = true;
+  input.setAttribute("aria-busy", "true");
+  results.setAttribute("aria-busy", "true");
   showLoading(language);
   scrollToResults();
 
   try {
     const response = await fetch("/api/recommend", {
       method: "POST",
+      signal: activeSearchController.signal,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query })
     });
     const text = await response.text();
     const data = text ? JSON.parse(text) : {};
+    if (searchId !== activeSearchId) return;
     if (!response.ok) throw new Error(data.error || (language === "en" ? "Search failed" : "החיפוש נכשל"));
     renderProducts(data);
   } catch (error) {
+    if (error.name === "AbortError" || searchId !== activeSearchId) return;
     results.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
     scrollToResults();
   } finally {
-    clearLoading();
-    button.disabled = false;
+    if (searchId === activeSearchId) {
+      clearLoading();
+      button.disabled = false;
+      input.removeAttribute("aria-busy");
+      results.removeAttribute("aria-busy");
+    }
   }
 }
 

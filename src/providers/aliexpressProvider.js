@@ -1,6 +1,10 @@
 const crypto = require("node:crypto");
 const { config } = require("../config");
 
+const DEFAULT_TIMEOUT_MS = 8500;
+const MAX_RETRIES = 2;
+const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+
 function formatTimestamp(date = new Date()) {
   const pad = (value) => String(value).padStart(2, "0");
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
@@ -62,14 +66,8 @@ async function searchAliExpressProducts(keywords, options = {}) {
     if (value !== undefined && value !== "") url.searchParams.set(key, value);
   }
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Accept": "application/json"
-    }
-  });
+  const { response, bodyText } = await fetchWithRetry(url);
 
-  const bodyText = await response.text();
   let body;
   try {
     body = JSON.parse(bodyText);
@@ -78,14 +76,70 @@ async function searchAliExpressProducts(keywords, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(`AliExpress API failed with ${response.status}: ${bodyText.slice(0, 500)}`);
+    throw createProviderError(`AliExpress API failed with ${response.status}`, response.status);
   }
 
   if (body?.error_response) {
-    throw new Error(body.error_response.msg || JSON.stringify(body.error_response));
+    const message = body.error_response.msg || body.error_response.sub_msg || "AliExpress API error";
+    throw createProviderError(message, 502);
   }
 
   return unwrapProducts(body);
+}
+
+async function fetchWithRetry(url, attempt = 0) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      signal: controller.signal,
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+    const bodyText = await response.text();
+
+    if (shouldRetry(response.status, bodyText) && attempt < MAX_RETRIES) {
+      await wait(backoffMs(attempt));
+      return fetchWithRetry(url, attempt + 1);
+    }
+
+    return { response, bodyText };
+  } catch (error) {
+    if (attempt < MAX_RETRIES && isRetryableFetchError(error)) {
+      await wait(backoffMs(attempt));
+      return fetchWithRetry(url, attempt + 1);
+    }
+    throw createProviderError(error.name === "AbortError" ? "AliExpress request timed out" : error.message, 504);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function shouldRetry(status, bodyText) {
+  if (RETRYABLE_STATUS.has(status)) return true;
+  return /frequency|timeout|temporarily|busy|rate/i.test(bodyText || "");
+}
+
+function isRetryableFetchError(error) {
+  return error.name === "AbortError" || /fetch failed|network|socket|timeout/i.test(error.message || "");
+}
+
+function backoffMs(attempt) {
+  return 450 * (attempt + 1) + Math.floor(Math.random() * 250);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function createProviderError(message, statusCode = 502) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  error.provider = "aliexpress";
+  return error;
 }
 
 module.exports = { searchAliExpressProducts, signTopRequest, unwrapProducts };

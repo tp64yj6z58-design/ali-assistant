@@ -14,6 +14,40 @@ function normalizeRating(value) {
   return rating > 5 ? Math.round((rating / 20) * 10) / 10 : rating;
 }
 
+const TERM_ALIASES = {
+  keychain: ["keychain", "key chain", "key ring", "keyring"],
+  plush: ["plush", "stuffed animal", "stuffed toy", "soft toy", "doll", "plushie"],
+  doll: ["doll", "plush", "stuffed animal", "stuffed toy", "soft toy"],
+  toy: ["toy", "toys", "plaything"],
+  charger: ["charger", "charging adapter", "power adapter"],
+  cable: ["cable", "cord", "wire"],
+  earbuds: ["earbuds", "ear buds", "earphones", "earphone", "tws"],
+  headphones: ["headphones", "headset", "earphones"],
+  case: ["case", "cover", "shell"],
+  protector: ["protector", "protective film", "tempered glass", "glass film"],
+  holder: ["holder", "mount", "stand", "bracket"],
+  inflator: ["inflator", "air compressor", "tire pump", "tyre pump"],
+  fountain: ["fountain", "water dispenser", "drinking fountain"],
+  watch: ["watch", "smartwatch", "smart watch"],
+  band: ["band", "strap", "bracelet"],
+  rug: ["rug", "carpet"],
+  curtain: ["curtain", "drape"],
+  bag: ["bag", "backpack", "pouch"],
+  blender: ["blender", "juicer cup", "mixer", "smoothie blender"],
+  portable: ["portable", "travel", "usb", "personal"],
+  cleaner: ["cleaner", "vacuum"],
+  vacuum: ["vacuum", "hoover"],
+  car: ["car", "auto", "automotive", "vehicle"],
+  cat: ["cat", "kitty", "kitten"],
+  dog: ["dog", "puppy", "pet dog"],
+  baby: ["baby", "infant", "toddler"],
+  phone: ["phone", "smartphone", "mobile phone"],
+  samsung: ["samsung", "galaxy"],
+  iphone: ["iphone", "ios"],
+  men: ["men", "mens", "male", "man"],
+  women: ["women", "womens", "female", "woman", "ladies"]
+};
+
 function normalizeProducts(rawProducts) {
   return rawProducts.map((product) => ({
     id: String(product.product_id || product.itemId || product.id || ""),
@@ -47,6 +81,11 @@ function termAppears(title, term) {
     .replace(/dash camera/g, "dash cam")
     .replace(/electric screwdriver/g, "cordless drill")
     .replace(/power drill/g, "cordless drill");
+  const candidates = TERM_ALIASES[String(term).toLowerCase()] || [term];
+  return candidates.some((candidate) => phraseAppears(normalizedTitle, candidate));
+}
+
+function phraseAppears(normalizedTitle, term) {
   const words = String(term).toLowerCase().split(/\s+/).filter(Boolean);
   return words.every((word) => {
     const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -55,27 +94,39 @@ function termAppears(title, term) {
   });
 }
 
-function relevanceScore(product, profile = {}) {
-  const title = (product.searchTitle || product.title).toLowerCase();
+function matchRequiredTerms(product, profile = {}) {
+  const title = (product.searchTitle || product.title || "").toLowerCase();
   const requiredTerms = profile.requiredTerms || [];
-  const excludedTerms = profile.excludedTerms || [];
+  return requiredTerms.filter((term) => termAppears(title, term));
+}
 
-  if (excludedTerms.some((term) => termAppears(title, term))) return -25;
+function hasExcludedTerm(product, profile = {}) {
+  const title = (product.searchTitle || product.title || "").toLowerCase();
+  const excludedTerms = profile.excludedTerms || [];
+  return excludedTerms.some((term) => termAppears(title, term));
+}
+
+function relevanceScore(product, profile = {}) {
+  const requiredTerms = profile.requiredTerms || [];
+
+  if (hasExcludedTerm(product, profile)) return -45;
   if (!requiredTerms.length) return 0;
 
-  const matched = requiredTerms.filter((term) => termAppears(title, term)).length;
+  const matched = matchRequiredTerms(product, profile).length;
   const ratio = matched / requiredTerms.length;
-  if (ratio === 0) return -18;
-  if (ratio < 0.5) return -8;
-  return Math.round(ratio * 28);
+  if (ratio === 0) return -35;
+  if (ratio < 0.5) return -18;
+  if (ratio < 0.75) return -7;
+  return Math.round(ratio * 38);
 }
 
 function confidenceScore(product, profile = {}) {
   const requiredTerms = profile.requiredTerms || [];
   if (!requiredTerms.length) return 70;
 
-  const title = (product.searchTitle || product.title || "").toLowerCase();
-  const matched = requiredTerms.filter((term) => termAppears(title, term)).length;
+  if (hasExcludedTerm(product, profile)) return 0;
+
+  const matched = matchRequiredTerms(product, profile).length;
   const relevance = relevanceScore(product, profile);
   const dataStrength = [
     product.imageUrl,
@@ -85,7 +136,7 @@ function confidenceScore(product, profile = {}) {
     product.orders >= 50
   ].filter(Boolean).length;
 
-  return clamp(Math.round((matched / requiredTerms.length) * 62 + Math.max(relevance, 0) + dataStrength * 3), 0, 100);
+  return clamp(Math.round((matched / requiredTerms.length) * 58 + Math.max(relevance, 0) + dataStrength * 3), 0, 100);
 }
 
 function scoreProduct(product, preferences = {}) {
@@ -144,7 +195,7 @@ function uniqueRankedProducts(products) {
 
 function pickTopProducts(rawProducts, preferences, profile = {}, language = "he") {
   const requiresRelevantMatch = Boolean(profile.requiredTerms && profile.requiredTerms.length);
-  const minimumConfidence = requiresRelevantMatch ? 58 : 35;
+  const minimumConfidence = requiresRelevantMatch ? 66 : 35;
 
   const ranked = normalizeProducts(rawProducts)
     .filter((product) => product.title && product.productUrl && product.imageUrl)
@@ -165,7 +216,7 @@ function pickTopProducts(rawProducts, preferences, profile = {}, language = "he"
     .sort((a, b) => b.score - a.score);
 
   const strict = ranked.filter((product) => requiresRelevantMatch ? product.relevance > 0 && product.confidence >= minimumConfidence : product.relevance > -18);
-  const backfill = ranked.filter((product) => requiresRelevantMatch ? product.relevance > 0 && product.confidence >= 42 : product.relevance > -18);
+  const backfill = ranked.filter((product) => requiresRelevantMatch ? product.relevance > 0 && product.confidence >= 58 : product.relevance > -18);
   return uniqueRankedProducts([...strict, ...backfill]).slice(0, 3);
 }
 

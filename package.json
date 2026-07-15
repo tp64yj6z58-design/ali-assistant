@@ -8,6 +8,8 @@
     "start": "node src/server.js",
     "dev": "node src/server.js",
     "check": "node src/check.js",
+    "assistant-check": "node src/assistantCoreCheck.js",
+    "gemini-check": "node src/geminiCheck.js",
     "quality": "node src/searchQuality.js",
     "probe": "node src/searchProbe.js"
   },

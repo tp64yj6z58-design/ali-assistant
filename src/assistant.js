@@ -3,6 +3,12 @@ const { buildSearchAttempts, buildSearchProfile, inferPreferences, normalizeQuer
 const { pickTopProducts } = require("./ranking");
 const { searchAliExpressProducts } = require("./providers/aliexpressProvider");
 const { searchMockProducts } = require("./providers/mockProvider");
+const {
+  analyzeShoppingIntent,
+  buildNoExactMatchResult,
+  createClarificationResult,
+  enrichRecommendationResult
+} = require("./aiAssistantCore");
 
 const CACHE_TTL_MS = 1000 * 60 * 20;
 const cache = new Map();
@@ -22,7 +28,7 @@ const text = {
   link: "\u05e7\u05d9\u05e9\u05d5\u05e8"
 };
 
-async function recommendProducts(userInput) {
+async function recommendProducts(userInput, options = {}) {
   const query = normalizeQuery(userInput);
   if (!query) {
     const error = new Error(text.missingQuery);
@@ -30,17 +36,21 @@ async function recommendProducts(userInput) {
     throw error;
   }
 
-  const profile = buildSearchProfile(query);
-  const cacheKey = `${detectLanguage(query)}:${profile.requiredTerms.join("|")}:${profile.keywords}:${query}`.toLowerCase();
+  const intent = await analyzeShoppingIntent(query);
+  const allowClarification = options.allowClarification !== false;
+  if (intent.clarification && allowClarification) return createClarificationResult(query, intent);
+
+  const profile = intent.profile || buildSearchProfile(query);
+  const cacheKey = `${intent.language}:${profile.requiredTerms.join("|")}:${profile.keywords}:${query}`.toLowerCase();
   const cached = getCached(cacheKey);
   if (cached) return cached;
 
   const keywords = profile.keywords;
-  const attempts = buildSearchAttempts(profile);
-  const preferences = inferPreferences(query);
-  const language = detectLanguage(query);
+  const attempts = intent.attempts && intent.attempts.length ? intent.attempts : buildSearchAttempts(profile);
+  const preferences = intent.preferences || inferPreferences(query);
+  const language = intent.language || detectLanguage(query);
   const clarification = buildClarification(query, profile, language);
-  if (clarification) return clarification;
+  if (clarification && allowClarification) return clarification;
 
   const source = hasAliExpressCredentials() ? "aliexpress" : "demo";
 
@@ -49,9 +59,19 @@ async function recommendProducts(userInput) {
     : searchMockProducts(keywords);
 
   const products = pickTopProducts(rawProducts, preferences, profile, language);
-  const confidence = buildResultConfidence(products, rawProducts.length, profile);
-  const refinements = buildRefinementOptions(query, profile, language);
+  const recommendedProducts = products.length < 3
+    ? await findAlternativeProducts(intent, source, language, products)
+    : products;
+  const confidence = buildResultConfidence(recommendedProducts, rawProducts.length, profile);
+  const refinements = intent.alternatives?.length ? intent.alternatives : buildRefinementOptions(query, profile, language);
   const lowConfidence = Boolean(profile.requiredTerms.length && confidence < 62);
+  const exactMatchUnavailable = !products.length && recommendedProducts.length > 0;
+
+  if (lowConfidence && !recommendedProducts.length) {
+    const noExact = buildNoExactMatchResult(query, intent, rawProducts.length, source);
+    setCached(cacheKey, noExact);
+    return noExact;
+  }
 
   const result = {
     query,
@@ -62,14 +82,40 @@ async function recommendProducts(userInput) {
     scannedCount: rawProducts.length,
     confidence,
     lowConfidence,
+    exactMatchUnavailable,
     refinementOptions: lowConfidence ? refinements : [],
-    assistantSummary: buildAssistantSummary(rawProducts.length, lowConfidence ? [] : products, language),
-    products: lowConfidence ? [] : products,
-    message: buildMessage(query, products, source, language)
+    assistantSummary: buildAssistantSummary(rawProducts.length, recommendedProducts, language),
+    products: recommendedProducts,
+    message: buildMessage(query, recommendedProducts, source, language)
   };
 
-  setCached(cacheKey, result);
-  return result;
+  const enriched = enrichRecommendationResult(result, intent, result.products);
+  setCached(cacheKey, enriched);
+  return enriched;
+}
+
+async function findAlternativeProducts(intent, source, language, existingProducts = []) {
+  if (existingProducts.length >= 3 || !intent.alternatives?.length) return existingProducts;
+  if (source !== "aliexpress") return existingProducts;
+
+  const seen = new Set(existingProducts.map((product) => product.id || product.title));
+  const combined = [...existingProducts];
+
+  for (const alternative of intent.alternatives.slice(0, 3)) {
+    const alternativeProfile = buildSearchProfile(alternative);
+    const raw = await searchAliExpressAttempts(buildSearchAttempts(alternativeProfile).slice(0, 4), language, alternativeProfile);
+    const picked = pickTopProducts(raw, intent.preferences || {}, alternativeProfile, language);
+    for (const product of picked) {
+      const key = product.id || product.title;
+      if (seen.has(key)) continue;
+      product.isAlternative = true;
+      combined.push(product);
+      seen.add(key);
+      if (combined.length >= 3) return combined;
+    }
+  }
+
+  return combined;
 }
 
 function buildClarification(query, profile, language = "he") {

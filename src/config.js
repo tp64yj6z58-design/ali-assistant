@@ -24,6 +24,7 @@ loadDotEnv();
 
 const config = {
   port: Number(process.env.PORT || 3000),
+  host: process.env.HOST || (process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1"),
   aliExpress: {
     appKey: process.env.ALIEXPRESS_APP_KEY || "",
     appSecret: process.env.ALIEXPRESS_APP_SECRET || "",
@@ -32,6 +33,11 @@ const config = {
     targetCurrency: process.env.ALIEXPRESS_TARGET_CURRENCY || "ILS",
     targetLanguage: process.env.ALIEXPRESS_TARGET_LANGUAGE || "EN",
     endpoint: process.env.ALIEXPRESS_ENDPOINT || "https://api-sg.aliexpress.com/sync"
+  },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || "",
+    model: process.env.GEMINI_MODEL || "gemini-3.1-flash-lite",
+    endpoint: process.env.GEMINI_ENDPOINT || "https://generativelanguage.googleapis.com/v1beta"
   }
 };
 

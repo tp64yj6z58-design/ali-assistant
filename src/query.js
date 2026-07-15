@@ -99,6 +99,50 @@ const HEBREW_TERMS = new Map([
   ["\u05e6\u05e8\u05d5\u05e8", ["keychain"]],
   ["\u05d5\u05d9\u05dc\u05d5\u05df", ["curtain"]],
   ["\u05d0\u05de\u05d1\u05d8\u05d9\u05d4", ["shower"]],
+  ["\u05d0\u05e8\u05e0\u05e7", ["wallet"]],
+  ["\u05d7\u05d2\u05d5\u05e8\u05d4", ["belt"]],
+  ["\u05db\u05d5\u05d1\u05e2", ["cap", "hat"]],
+  ["\u05d2\u05e8\u05d1\u05d9\u05d9\u05dd", ["socks"]],
+  ["\u05d2\u05e8\u05d1\u05d9\u05dd", ["socks"]],
+  ["\u05de\u05db\u05e0\u05e1\u05d9\u05d9\u05dd", ["pants"]],
+  ["\u05de\u05db\u05e0\u05e1", ["pants"]],
+  ["\u05de\u05e2\u05d9\u05dc", ["jacket"]],
+  ["\u05de\u05d6\u05d5\u05d5\u05d3\u05d4", ["suitcase"]],
+  ["\u05d8\u05d0\u05d1\u05dc\u05d8", ["tablet"]],
+  ["\u05d0\u05d9\u05d9\u05e4\u05d3", ["ipad", "tablet"]],
+  ["\u05de\u05d3\u05d1\u05e7\u05d4", ["sticker"]],
+  ["\u05de\u05d3\u05d1\u05e7\u05d5\u05ea", ["sticker"]],
+  ["\u05e6\u05de\u05d9\u05d3", ["bracelet"]],
+  ["\u05d8\u05d1\u05e2\u05ea", ["ring"]],
+  ["\u05e9\u05e8\u05e9\u05e8\u05ea", ["necklace"]],
+  ["\u05e2\u05d2\u05d9\u05dc\u05d9\u05dd", ["earrings"]],
+  ["\u05dc\u05d9\u05dc\u05d4", ["night"]],
+  ["\u05db\u05e8\u05d9\u05ea", ["pillow"]],
+  ["\u05e9\u05de\u05d9\u05db\u05d4", ["blanket"]],
+  ["\u05e9\u05d8\u05d9\u05d7", ["rug"]],
+  ["\u05de\u05d3\u05e3", ["shelf"]],
+  ["\u05d0\u05e8\u05d2\u05d5\u05e0\u05d9\u05ea", ["organizer"]],
+  ["\u05e7\u05d5\u05e4\u05e1\u05d4", ["storage", "box"]],
+  ["\u05e7\u05d5\u05e4\u05e1\u05d0", ["storage", "box"]],
+  ["\u05e6\u05e2\u05e6\u05d5\u05e2", ["toy"]],
+  ["\u05e6\u05e2\u05e6\u05d5\u05e2\u05d9\u05dd", ["toy"]],
+  ["\u05de\u05e9\u05d7\u05e7", ["toy"]],
+  ["\u05de\u05d3\u05d7\u05d5\u05dd", ["thermometer"]],
+  ["\u05de\u05e9\u05d0\u05d1\u05d4", ["pump"]],
+  ["\u05de\u05e9\u05d0\u05d1\u05ea", ["pump"]],
+  ["\u05e7\u05d5\u05de\u05e4\u05e8\u05e1\u05d5\u05e8", ["air", "compressor"]],
+  ["\u05de\u05e0\u05e9\u05d0", ["carrier"]],
+  ["\u05db\u05e1\u05d0", ["chair"]],
+  ["\u05db\u05d9\u05e1\u05d0", ["chair"]],
+  ["\u05de\u05d9\u05e7\u05e8\u05d5\u05e4\u05d5\u05df", ["microphone"]],
+  ["\u05d6\u05d9\u05db\u05e8\u05d5\u05df", ["memory"]],
+  ["\u05d6\u05db\u05e8\u05d5\u05df", ["memory"]],
+  ["\u05db\u05e8\u05d8\u05d9\u05e1", ["card"]],
+  ["\u05e7\u05d5\u05e8\u05d0", ["reader"]],
+  ["\u05de\u05ea\u05d0\u05dd", ["adapter"]],
+  ["\u05e9\u05dc\u05d8", ["remote"]],
+  ["\u05de\u05d1\u05e8\u05d2\u05d4", ["cordless", "drill"]],
+  ["\u05de\u05e7\u05d3\u05d7\u05d4", ["drill"]],
   ["ארנק", ["wallet"]],
   ["חגורה", ["belt"]],
   ["כובע", ["cap", "hat"]],
@@ -146,6 +190,36 @@ const HEBREW_TERMS = new Map([
 ]);
 
 const PHRASE_TERMS = [
+  {
+    pattern: /\u05d0\u05e8\u05e0\u05e7.*\u05d2\u05d1\u05e8|\u05d0\u05e8\u05e0\u05e7.*\u05dc\u05d2\u05d1\u05e8/,
+    terms: ["men", "wallet"],
+    exclude: ["organizer", "bag", "pouch", "phone case", "airtag", "tracker", "keychain"]
+  },
+  {
+    pattern: /\u05d0\u05e8\u05e0\u05e7.*\u05d0\u05d9\u05e9\u05d4|\u05d0\u05e8\u05e0\u05e7.*\u05dc\u05d0\u05d9\u05e9\u05d4/,
+    terms: ["women", "wallet"],
+    exclude: ["organizer", "bag", "pouch", "phone case", "airtag", "tracker", "keychain"]
+  },
+  {
+    pattern: /\u05e6\u05e2\u05e6\u05d5\u05e2.*\u05d7\u05ea\u05d5\u05dc|\u05de\u05e9\u05d7\u05e7.*\u05d7\u05ea\u05d5\u05dc|\u05d1\u05d5\u05d1\u05d4.*\u05d7\u05ea\u05d5\u05dc|\u05d7\u05ea\u05d5\u05dc.*\u05d1\u05d5\u05d1\u05d4|cat.*doll|cat.*plush|kitty.*plush/,
+    terms: ["cat", "plush"],
+    exclude: ["sticker", "stickers", "decal", "decals", "patch", "badge", "poster", "print", "phone case", "keychain", "charm", "pendant", "wall art", "stationery", "catnip", "teaser", "chew", "chewing", "for cats", "pet toy", "pet cat", "claw", "claws", "mouse", "mice", "sisal", "hair clip", "hairpin", "barrette", "cat ears"]
+  },
+  {
+    pattern: /\u05de\u05d9\u05d8\u05d4.*\u05db\u05dc\u05d1|\u05de\u05d9\u05d8\u05ea.*\u05db\u05dc\u05d1/,
+    terms: ["dog", "bed"],
+    exclude: ["toy", "collar", "leash", "bowl", "blanket only", "cover only", "hair remover", "brush", "stairs", "ramp", "training pad", "pee pad", "urine pad", "diaper pad", "reusable pad"]
+  },
+  {
+    pattern: /\u05e6\u05e2\u05e6\u05d5\u05e2.*\u05db\u05dc\u05d1|\u05de\u05e9\u05d7\u05e7.*\u05db\u05dc\u05d1/,
+    terms: ["dog", "toy"],
+    exclude: ["collar", "leash", "bowl", "bed", "clothes", "tag", "sticker", "decal", "ornament"]
+  },
+  {
+    pattern: /\u05d1\u05dc\u05e0\u05d3\u05e8.*\u05e0\u05d9\u05d9\u05d3|\u05d1\u05dc\u05e0\u05d3\u05e8.*\u05e0\u05d9\u05d9\u05d3\u05ea|portable.*blender/,
+    terms: ["portable", "blender"],
+    exclude: ["coffee grinder", "grinder", "chopper", "garlic", "meat mincer", "manual", "vegetable cutter", "slicer", "makeup", "sponge", "brush"]
+  },
   {
     pattern: /\u05db\u05d1\u05dc.*\u05d0\u05d9\u05d9\u05e4\u05d5\u05df|\u05db\u05d1\u05dc.*iphone|iphone.*cable/,
     terms: ["iphone", "cable"],
@@ -717,7 +791,7 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("air") && has("fryer")) {
-    excluded.push("paper", "liner", "baking", "tray", "cable", "organizer", "clip", "accessories", "oil", "dispenser", "sprayer", "spray", "brush", "salad", "grilling", "timer", "control", "switch", "button", "replacement", "dollhouse", "miniature", "model", "ornament", "ornaments", "cookware", "cover", "protector", "protective", "bumper", "parts", "wheels", "slider", "pulley", "dust cover", "steamer board", "motor", "fan", "valve", "dishwasher", "ice maker", "fork", "component", "oven", "roasting", "skewer", "skewers", "rubber feet", "feet", "corner guard", "heating element", "heating plate", "spiral");
+    excluded.push("paper", "liner", "baking", "tray", "cable", "organizer", "clip", "accessories", "oil", "dispenser", "sprayer", "spray", "brush", "salad", "grilling", "timer", "controller", "temperature controller", "switch", "button", "replacement", "dollhouse", "miniature", "model", "ornament", "ornaments", "cookware", "cover", "protector", "protective", "bumper", "parts", "wheels", "slider", "pulley", "dust cover", "steamer board", "motor", "fan", "valve", "dishwasher", "ice maker", "fork", "component", "roasting", "rotisserie", "rack", "grill basket", "skewer", "skewers", "rubber feet", "feet", "corner guard", "heating element", "heating plate", "spiral");
   }
 
   if (has("yoga") && has("mat")) {
@@ -733,7 +807,7 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("cat") && has("plush")) {
-    excluded.push("sticker", "stickers", "decal", "decals", "patch", "badge", "poster", "print", "phone case", "keychain", "charm", "pendant", "wall art", "stationery", "notebook", "card");
+    excluded.push("sticker", "stickers", "decal", "decals", "patch", "badge", "poster", "print", "phone case", "keychain", "charm", "pendant", "wall art", "stationery", "notebook", "card", "catnip", "teaser", "chew", "chewing", "for cats", "pet toy", "pet cat", "claw", "claws", "mouse", "mice", "sisal", "hair clip", "hairpin", "barrette", "cat ears");
   }
 
   if (has("baby") && has("stroller")) {
@@ -770,6 +844,9 @@ function addCategoryExclusions(requiredTerms, excluded) {
 
   if (has("blender")) {
     excluded.push("makeup", "sponge", "brush", "puff", "cosmetic", "milk frother", "frother", "whisk", "egg beater", "cord wrapper", "cable holder", "dollhouse", "miniature", "art blender", "tortillions", "hair fiber", "hair fibers");
+    if (has("portable")) {
+      excluded.push("coffee grinder", "grinder", "chopper", "garlic", "meat mincer", "manual", "vegetable cutter", "slicer");
+    }
   }
 
   if (has("coffee") && has("grinder")) {
@@ -785,7 +862,7 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("power") && has("bank")) {
-    excluded.push("case", "cover", "cable", "cord", "wire", "holder", "phone case", "empty shell", "battery cell", "night light", "lamp", "book light", "keychain cable", "charging cable", "tester", "meter", "voltage", "current", "ammeter", "detector", "fan", "cooling fan", "camping light", "lantern", "flashlight", "floodlight", "solar panel", "security camera", "lighting system", "work light", "light bar", "emergency light", "module", "charging module", "diy", "storage bag", "organizer", "electronic organizer", "battery charger module");
+    excluded.push("case", "cover", "cable", "cord", "wire", "holder", "phone case", "empty shell", "battery cell", "car charger", "car adapter", "cigarette lighter", "vehicle charger", "auto charger", "night light", "lamp", "book light", "keychain cable", "charging cable", "tester", "meter", "voltage", "current", "ammeter", "detector", "fan", "cooling fan", "camping light", "lantern", "flashlight", "floodlight", "solar panel", "security camera", "lighting system", "work light", "light bar", "emergency light", "module", "charging module", "diy", "storage bag", "organizer", "electronic organizer", "battery charger module");
   }
 
   if (has("screen") && has("protector")) {
@@ -833,7 +910,11 @@ function addCategoryExclusions(requiredTerms, excluded) {
   }
 
   if (has("dog") && has("bed")) {
-    excluded.push("toy", "collar", "leash", "bowl", "blanket only", "cover only", "bed bug", "uv", "flashlight", "urine detector", "hair remover", "brush", "furniture", "stairs", "steps", "ladder", "ramp");
+    excluded.push("toy", "collar", "leash", "bowl", "blanket only", "cover only", "bed bug", "uv", "flashlight", "urine detector", "hair remover", "brush", "furniture", "stairs", "steps", "ladder", "ramp", "training pad", "pee pad", "urine pad", "diaper pad", "reusable pad");
+  }
+
+  if (has("laptop") && has("stand")) {
+    excluded.push("car phone holder", "phone holder", "same screen", "camera", "webcam", "tablet only", "keyboard holder", "mount only");
   }
 
   if (has("dog") && has("collar")) {

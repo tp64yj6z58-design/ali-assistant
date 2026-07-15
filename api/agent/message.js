@@ -1,5 +1,5 @@
-const { saveFeedback } = require("../src/feedbackStore");
-const { applySecurityHeaders, enforceRateLimit, publicError, readJsonBody } = require("../src/httpUtils");
+const { handleAgentMessage } = require("../../src/personalAgent");
+const { applySecurityHeaders, enforceRateLimit, publicError, readJsonBody } = require("../../src/httpUtils");
 
 module.exports = async function handler(req, res) {
   applySecurityHeaders(res);
@@ -11,10 +11,13 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    enforceRateLimit(req, "feedback");
+    enforceRateLimit(req, "agent-message");
     const body = await readJsonBody(req);
-    const feedback = saveFeedback(body);
-    res.status(200).json({ ok: true, feedback });
+    const result = await handleAgentMessage({
+      sessionId: body.sessionId,
+      message: body.message
+    });
+    res.status(200).json(result);
   } catch (error) {
     const { statusCode, message } = publicError(error);
     res.status(statusCode).json({ error: message });
