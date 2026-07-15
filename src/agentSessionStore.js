@@ -66,7 +66,19 @@ function hasShownProduct(session, product) {
 }
 
 function productKey(product) {
-  return String(product?.id || product?.promotion_link || product?.productUrl || product?.title || "").trim().toLowerCase();
+  const titleKey = productTitleFingerprint(product?.title || product?.searchTitle || "");
+  if (titleKey) return `title:${titleKey}`;
+  return String(product?.id || product?.promotion_link || product?.productUrl || "").trim().toLowerCase();
+}
+
+function productTitleFingerprint(title) {
+  const stopWords = new Set(["with", "for", "and", "the", "usb", "new", "hot", "sale", "original"]);
+  const words = String(title || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 2 && !/^\d+$/.test(word) && !stopWords.has(word));
+  return [...new Set(words)].sort().slice(0, 14).join(" ");
 }
 
 function cleanupExpiredSessions(now = Date.now()) {

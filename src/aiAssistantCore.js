@@ -385,6 +385,7 @@ function detectBrands(query) {
 }
 
 function mergeIntent(fallback, llm) {
+  const shouldUseLlmClarification = Boolean(fallback.clarification || fallback.confidence < 45);
   return {
     ...fallback,
     engine: "gemini",
@@ -392,7 +393,7 @@ function mergeIntent(fallback, llm) {
     intent: llm.intent || fallback.intent,
     category: llm.category || fallback.category,
     alternatives: unique([...(llm.alternatives || []), ...(fallback.alternatives || [])]).slice(0, 6),
-    clarification: llm.clarification || fallback.clarification,
+    clarification: shouldUseLlmClarification ? (llm.clarification || fallback.clarification) : fallback.clarification,
     explanation: llm.explanation || fallback.explanation
   };
 }

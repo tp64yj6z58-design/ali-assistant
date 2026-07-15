@@ -32,7 +32,54 @@ async function analyzeIntentWithGemini(payload) {
   return null;
 }
 
-async function callGeminiModel(model, payload) {
+async function planAgentMessageWithGemini(payload) {
+  if (!hasGeminiCredentials()) return null;
+
+  const models = unique([config.gemini.model, ...MODEL_FALLBACKS]);
+  for (const model of models) {
+    const result = await callGeminiModel(model, payload, [
+      "You are the brain of a floating conversational AliExpress shopping assistant.",
+      "You do not search products directly. You decide what the existing search engine should search.",
+      "Return JSON only. Never include markdown.",
+      "Schema: {\"action\":\"clarify|search|refine|more|chat\",\"language\":\"he|en\",\"reply\":\"string\",\"searchQuery\":\"string\",\"product\":\"string\",\"category\":\"string\",\"budget\":number|null,\"filters\":{\"color\":\"string\",\"brand\":\"string\",\"wantsCheap\":boolean,\"wantsReviews\":boolean,\"wantsBranded\":boolean},\"alternatives\":[\"string\"],\"quickReplies\":[\"string\"],\"confidence\":0-100}.",
+      "Ask one short clarification question if the product is vague, incomplete, or could mean several product types.",
+      "For follow-up messages, update the previous conversation context instead of starting over.",
+      "If the user asks for more options, action must be more.",
+      "If enough detail exists, action must be search or refine and searchQuery must be a concise AliExpress query in English unless the user specifically needs Hebrew output.",
+      "Keep reply natural and practical, in the user's primary language."
+    ].join(" "));
+    if (result) return normalizeAgentPlan(result);
+  }
+
+  return null;
+}
+
+async function composeAgentResponseWithGemini(payload) {
+  if (!hasGeminiCredentials()) return null;
+
+  const models = unique([config.gemini.model, ...MODEL_FALLBACKS]);
+  for (const model of models) {
+    const result = await callGeminiModel(model, payload, [
+      "You are a helpful shopping expert inside a floating AliExpress assistant.",
+      "Return JSON only. Never include markdown.",
+      "Schema: {\"reply\":\"string\",\"quickReplies\":[\"string\"]}.",
+      "Explain why the products fit the user's request. Be concise, natural and trustworthy.",
+      "Do not claim you searched an exact number unless a scannedCount value is provided.",
+      "Never say no products found. If products are weak or alternatives, explain the closest useful direction.",
+      "Keep the response in the user's primary language."
+    ].join(" "));
+    if (result && typeof result.reply === "string") {
+      return {
+        reply: result.reply,
+        quickReplies: Array.isArray(result.quickReplies) ? result.quickReplies.map(String).filter(Boolean).slice(0, 5) : []
+      };
+    }
+  }
+
+  return null;
+}
+
+async function callGeminiModel(model, payload, systemText) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
 
@@ -46,7 +93,7 @@ async function callGeminiModel(model, payload) {
       body: JSON.stringify({
         systemInstruction: {
           parts: [{
-            text: [
+            text: systemText || [
               "You are an ecommerce shopping intent parser for an AliExpress affiliate assistant.",
               "Return JSON only.",
               "Never include markdown.",
@@ -76,6 +123,32 @@ async function callGeminiModel(model, payload) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function normalizeAgentPlan(value) {
+  if (!value || typeof value !== "object") return null;
+  const action = ["clarify", "search", "refine", "more", "chat"].includes(value.action) ? value.action : "search";
+  const filters = value.filters && typeof value.filters === "object" ? value.filters : {};
+
+  return {
+    action,
+    language: value.language === "en" ? "en" : "he",
+    reply: typeof value.reply === "string" ? value.reply : "",
+    searchQuery: typeof value.searchQuery === "string" ? value.searchQuery.trim() : "",
+    product: typeof value.product === "string" ? value.product.trim() : "",
+    category: typeof value.category === "string" ? value.category.trim() : "",
+    budget: value.budget === null || value.budget === undefined || value.budget === "" ? null : Number(value.budget),
+    filters: {
+      color: typeof filters.color === "string" ? filters.color.trim() : "",
+      brand: typeof filters.brand === "string" ? filters.brand.trim() : "",
+      wantsCheap: Boolean(filters.wantsCheap),
+      wantsReviews: Boolean(filters.wantsReviews),
+      wantsBranded: Boolean(filters.wantsBranded)
+    },
+    alternatives: Array.isArray(value.alternatives) ? value.alternatives.map(String).filter(Boolean).slice(0, 6) : [],
+    quickReplies: Array.isArray(value.quickReplies) ? value.quickReplies.map(String).filter(Boolean).slice(0, 5) : [],
+    confidence: Number(value.confidence || 0)
+  };
 }
 
 async function verifyGeminiInitialization() {
@@ -134,5 +207,7 @@ module.exports = {
   analyzeIntentWithGemini,
   hasGeminiCredentials,
   listGeminiModels,
+  planAgentMessageWithGemini,
+  composeAgentResponseWithGemini,
   verifyGeminiInitialization
 };
