@@ -5,6 +5,7 @@ const statusEl = document.querySelector("#status");
 const exampleButtons = document.querySelectorAll("[data-query]");
 const navLinks = document.querySelectorAll(".navLinks a");
 const toggleSections = document.querySelectorAll(".toggleSection");
+const heroCta = document.querySelector(".heroCta");
 
 let lastQuery = "";
 let loadingTimer = null;
@@ -32,7 +33,7 @@ async function loadStatus() {
     const response = await fetch("/api/health");
     const health = await response.json();
     statusEl.textContent = health.aliExpressConnected
-      ? "מחובר ל-AliExpress Affiliate"
+      ? "מחובר ל-AliExpress Affiliate · חי"
       : "מצב דמו: מחכה למפתחות AliExpress";
     statusEl.classList.toggle("live", health.aliExpressConnected);
   } catch {
@@ -66,6 +67,16 @@ navLinks.forEach((link) => {
       history.replaceState(null, "", id === "home" ? "#home" : `#${id}`);
     }
   });
+});
+
+heroCta?.addEventListener("click", () => {
+  const launcher = document.querySelector(".ai-agent-launcher");
+  if (launcher) {
+    launcher.click();
+    return;
+  }
+
+  document.querySelector("#searchForm")?.scrollIntoView({ behavior: "smooth", block: "center" });
 });
 
 function detectLanguage(value) {

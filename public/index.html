@@ -11,10 +11,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ali-assistant.vercel.app/">
     <meta name="twitter:card" content="summary">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="shortcut icon" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/favicon.svg">
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=home2">
     <link rel="stylesheet" href="/ai-agent-ui.css?v=3f">
     <script type="application/ld+json">
       {
@@ -53,96 +56,74 @@
           </a>
         </header>
 
-        <section id="home" class="hero">
-          <div class="heroArt" aria-label="תצוגת מוצרים מומלצים">
-            <div class="orb orbLarge"></div>
-            <div class="orb orbSmall"></div>
-            <div class="showcase">
-              <div class="showcaseHeader">
-                <span class="spark">✧</span>
-                <span>AI-Powered Shopping</span>
-              </div>
-              <span class="aiBubble">AI</span>
-
-              <div class="showcaseCards">
-                <article class="miniProduct">
-                  <span class="discount">35%-</span>
-                  <div class="productVisual earbudsVisual" aria-hidden="true">
-                    <span></span><span></span>
-                  </div>
-                  <h3>אוזניות בלוטוס TWS</h3>
-                  <p><strong>$18.90</strong><del>$29.00</del></p>
-                  <small>★ 4.7 (2,156)</small>
-                </article>
-
-                <article class="miniProduct featuredMini">
-                  <span class="discount">50%-</span>
-                  <div class="productVisual watchVisual" aria-hidden="true">
-                    <span></span>
-                  </div>
-                  <h3>שעון חכם ספורט</h3>
-                  <p><strong>$29.99</strong><del>$59.99</del></p>
-                  <small>★ 4.6 (987)</small>
-                </article>
-
-                <article class="miniProduct">
-                  <span class="discount">42%-</span>
-                  <div class="productVisual holderVisual" aria-hidden="true">
-                    <span></span>
-                  </div>
-                  <h3>מטען אלחוטי לרכב</h3>
-                  <p><strong>$12.45</strong><del>$21.49</del></p>
-                  <small>★ 4.8 (1,327)</small>
-                </article>
-              </div>
-
-              <div class="sliderDots" aria-hidden="true">
-                <span class="active"></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="heroContent">
-            <div class="eyebrow">
-              <span>✧</span>
-              עוזר שבודק בשבילך
-              <span>✧</span>
-            </div>
-            <h1>מצא את 3 המוצרים <span>הכי שווים</span> בלי לחפור באלי אקספרס</h1>
-            <p class="summary">
-              העוזר החכם שלנו סורק, משווה ומביא לך רק את ההצעות הכי טובות. חוסך זמן, כסף והתלבטויות.
-            </p>
-            <div class="trustRow" aria-label="יתרונות">
-              <span><b>⚡</b>מהיר וחכם</span>
-              <span><b>◈</b>מוצרים נבחרים</span>
-              <span><b>↻</b>עדכונים יומיים</span>
-            </div>
-            <div id="status" class="status">בודק חיבור...</div>
-          </div>
+        <section id="home" class="introHero" aria-label="פתיחת האתר">
+          <div id="status" class="introBadge">מחובר ל-AliExpress Affiliate · חי</div>
+          <h1 class="introTitle">קונים חכם</h1>
+          <p class="introSummary">ה-AI בודק מחיר, דירוג ואמינות מוכר לפני שאתה קונה - אתה רק שואל, הוא מביא את התשובה.</p>
+          <button class="heroCta" type="button">לחפש עם הסוכן ↵</button>
         </section>
 
-        <section id="search" class="searchPanel">
-          <form id="searchForm" class="searchForm">
-            <label for="query">מה אתה מחפש?</label>
-            <div class="searchRow">
-              <input id="query" name="query" autocomplete="off" placeholder="לדוגמה: מטען מהיר לרכב USB-C" required>
-              <button type="submit">
-                חפש עכשיו
-                <span aria-hidden="true">⌕</span>
-              </button>
+        <section id="search" class="hero">
+          <div class="searchPanel">
+            <form id="searchForm" class="searchForm">
+              <label for="query">מה אתה מחפש?</label>
+              <div class="searchRow">
+                <input id="query" name="query" autocomplete="off" placeholder="לדוגמה: מטען מהיר לרכב USB-C" required>
+                <button type="submit">
+                  חפש עכשיו
+                  <span aria-hidden="true">⌕</span>
+                </button>
+              </div>
+              <div class="popularWrap">
+                <strong>חיפושים פופולריים:</strong>
+                <div class="exampleChips" aria-label="דוגמאות חיפוש">
+                  <button type="button" data-query="מטען לרכב"><span aria-hidden="true">▱</span>מטען לרכב</button>
+                  <button type="button" data-query="אוזניות בלוטוס"><span aria-hidden="true">◉</span>אוזניות בלוטוס</button>
+                  <button type="button" data-query="car charger"><span aria-hidden="true">⌕</span>car charger</button>
+                  <button type="button" data-query="שעון חכם"><span aria-hidden="true">◇</span>שעון חכם</button>
+                </div>
+              </div>
+            </form>
+
+            <div class="stats" aria-label="נתוני אמון">
+              <div class="stat"><b>50,000+</b><span>מוצרים נבדקים כל שבוע</span></div>
+              <div class="stat"><b>28%</b><span>חיסכון ממוצע למשתמש</span></div>
+              <div class="stat"><b>4.8</b><span>דירוג ממוצע של ההמלצות</span></div>
             </div>
-            <div class="popularWrap">
-              <strong>חיפושים פופולריים:</strong>
-              <div class="exampleChips" aria-label="דוגמאות חיפוש">
-                <button type="button" data-query="מטען לרכב"><span aria-hidden="true">▱</span>מטען לרכב</button>
-                <button type="button" data-query="אוזניות בלוטוס"><span aria-hidden="true">◉</span>אוזניות בלוטוס</button>
-                <button type="button" data-query="car charger"><span aria-hidden="true">⌕</span>car charger</button>
-                <button type="button" data-query="שעון חכם"><span aria-hidden="true">◇</span>שעון חכם</button>
+          </div>
+
+          <aside class="receipt" aria-label="קבלת ה-AI">
+            <div class="receiptTop">
+              <span>קבלת ה-AI · #1</span>
+              <strong>נבדק לפני 4 דקות</strong>
+            </div>
+            <div class="receiptProduct">
+              <div class="receiptThumb" aria-hidden="true">תמונה</div>
+              <div>
+                <h2>אוזניות בלוטוס TWS ANC</h2>
+                <div class="receiptPrice">
+                  <span>$18.90</span>
+                  <del>$29.00</del>
+                  <b>35%-</b>
+                </div>
               </div>
             </div>
-          </form>
+
+            <div class="chartWrap">
+              <svg viewBox="0 0 300 64" class="sparkline" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="0,20 30,24 60,18 90,30 120,26 150,40 180,34 210,48 240,42 270,52 300,50" fill="none" stroke="#e5ded0" stroke-width="2"></polyline>
+                <polyline points="0,20 30,24 60,18 90,30 120,26 150,40 180,34 210,48 240,42 270,52 300,50" fill="none" stroke="#D6491F" stroke-width="2.5"></polyline>
+                <circle cx="300" cy="50" r="4" fill="#D6491F"></circle>
+              </svg>
+              <div class="chartLabels"><span>לפני 30 יום</span><span>המחיר הכי נמוך שנרשם</span></div>
+            </div>
+
+            <div class="reasons">
+              <div class="reason"><span>✓</span><p><b>המחיר הכי נמוך</b> ב-30 הימים האחרונים</p></div>
+              <div class="reason"><span>✓</span><p>דירוג <b>4.7 מתוך 5</b> מעל 2,156 ביקורות</p></div>
+              <div class="reason"><span>✓</span><p>המוכר עם <b>98% שביעות רצון</b> ומשלוח מהיר</p></div>
+            </div>
+          </aside>
         </section>
 
         <section id="how" class="infoSection toggleSection" hidden>
@@ -265,7 +246,7 @@
         </footer>
       </div>
     </main>
-    <script src="/app.js"></script>
+    <script src="/app.js?v=home2"></script>
     <script src="/ai-agent-ui.js?v=3f"></script>
   </body>
 </html>
