@@ -161,7 +161,7 @@ button {
 .navLinks a:hover,
 .navLinks a.active {
   color: var(--ink);
-  background: rgba(214, 73, 31, 0.08);
+  background: transparent;
   transform: translateY(-1px);
 }
 
@@ -233,7 +233,6 @@ button {
   display: none !important;
 }
 
-.features,
 .sliderDots {
   display: none !important;
 }
@@ -1176,8 +1175,10 @@ input:focus {
   border-radius: 999px;
   color: #4f6f32;
   background: #eaf2df;
-  font-size: 13px;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
 }
 
 .introBadge::before {
@@ -1422,6 +1423,196 @@ input:focus {
 
 .reason b {
   color: var(--ink);
+}
+
+.bigStatBanner {
+  width: min(1235px, calc(100% - 160px));
+  margin: 42px auto 34px;
+  text-align: center;
+}
+
+.bigStatBanner strong {
+  display: block;
+  color: #D6491F;
+  font-family: var(--font-mono);
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: 0;
+  direction: ltr;
+}
+
+.bigStatBanner span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.weeklySection {
+  width: min(1235px, calc(100% - 160px));
+  margin: 0 auto 44px;
+}
+
+.weeklyHead {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 2px solid #D6491F;
+}
+
+.weeklyHead h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.weeklyHead span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.weeklyTabs {
+  margin-bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.weeklyTabs button {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.62);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.weeklyTabs button.active {
+  color: #fff;
+  background: #D6491F;
+  border-color: #D6491F;
+}
+
+.weeklyList {
+  display: grid;
+  gap: 14px;
+}
+
+.weeklyItem {
+  min-height: 112px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 42px 84px 1fr auto;
+  gap: 20px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.weeklyNum {
+  color: #D6491F;
+  font-family: var(--font-display);
+  font-size: 26px;
+}
+
+.weeklyThumb {
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #a49c8e;
+  background: #f3ede3;
+  font-size: 11px;
+}
+
+.weeklyInfo h3 {
+  margin: 0 0 7px;
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.weeklyInfo p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.weeklyInfo b {
+  color: #4f6f32;
+  font-weight: 600;
+}
+
+.weeklyPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  direction: ltr;
+  font-family: var(--font-mono);
+}
+
+.weeklyPrice b {
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #8a341c;
+  background: #f8e1d8;
+  font-family: var(--font-apple);
+  font-size: 12px;
+}
+
+.weeklyPrice strong {
+  color: var(--ink);
+  font-size: 20px;
+}
+
+.weeklyPrice del {
+  color: #a49c8e;
+  font-size: 13px;
+}
+
+.weeklyNote {
+  margin: 16px 0 0;
+  padding: 18px 22px;
+  border-radius: 14px;
+  color: #3e4a2c;
+  background: #eaf2df;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.quoteStrip {
+  max-width: 720px;
+  margin: 0 auto 46px;
+  text-align: center;
+}
+
+.quoteStrip p {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.quoteStrip span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 @keyframes riseIn {
@@ -1860,6 +2051,19 @@ body,
     justify-content: center;
     text-align: center;
   }
+
+  .bigStatBanner,
+  .weeklySection {
+    width: min(100%, 980px);
+  }
+
+  .weeklyItem {
+    grid-template-columns: 38px 76px 1fr;
+  }
+
+  .weeklyPrice {
+    grid-column: 3;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1896,5 +2100,42 @@ body,
   .receiptTop,
   .receiptProduct {
     align-items: flex-start;
+  }
+
+  .bigStatBanner,
+  .weeklySection {
+    width: 100%;
+  }
+
+  .bigStatBanner strong {
+    font-size: 32px;
+  }
+
+  .weeklyHead {
+    display: grid;
+    gap: 6px;
+  }
+
+  .weeklyItem {
+    grid-template-columns: 36px 70px 1fr;
+    gap: 12px;
+  }
+
+  .weeklyThumb {
+    width: 70px;
+    height: 70px;
+  }
+
+  .weeklyPrice {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .quoteStrip {
+    padding-inline: 16px;
+  }
+
+  .quoteStrip p {
+    font-size: 19px;
   }
 }
