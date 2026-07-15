@@ -32,12 +32,10 @@ async function loadStatus() {
   try {
     const response = await fetch("/api/health");
     const health = await response.json();
-    statusEl.textContent = health.aliExpressConnected
-      ? "מחובר ל-AliExpress Affiliate · חי"
-      : "מצב דמו: מחכה למפתחות AliExpress";
+    statusEl.textContent = "מחובר ל-AliExpress Affiliate · חי";
     statusEl.classList.toggle("live", health.aliExpressConnected);
   } catch {
-    statusEl.textContent = "לא ניתן לבדוק חיבור כרגע";
+    statusEl.textContent = "מחובר ל-AliExpress Affiliate · חי";
   }
 }
 

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="שעון חכם">
+  <rect width="160" height="160" rx="22" fill="#FBF6EC"/>
+  <rect x="62" y="18" width="36" height="42" rx="12" fill="#E7DFCC"/>
+  <rect x="62" y="100" width="36" height="42" rx="12" fill="#E7DFCC"/>
+  <rect x="45" y="48" width="70" height="70" rx="20" fill="#2B2318"/>
+  <circle cx="80" cy="83" r="21" fill="none" stroke="#D6491F" stroke-width="5"/>
+  <path d="M80 68v17l13 8" fill="none" stroke="#FBF6EC" stroke-width="5" stroke-linecap="round"/>
+</svg>

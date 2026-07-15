@@ -17,7 +17,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="shortcut icon" href="/favicon.svg">
     <link rel="apple-touch-icon" href="/favicon.svg">
-    <link rel="stylesheet" href="/styles.css?v=home4">
+    <link rel="stylesheet" href="/styles.css?v=home6">
     <link rel="stylesheet" href="/ai-agent-ui.css?v=3f">
     <script type="application/ld+json">
       {
@@ -34,24 +34,23 @@
   <body>
     <main class="app">
       <div class="shell">
-        <header class="navbar" aria-label="ניווט ראשי">
+        <header id="top" class="navbar" aria-label="ניווט ראשי">
           <a class="brand" href="#home" aria-label="AliExpress AI Agent">
             <span class="brandIcon" aria-hidden="true">AI</span>
             <span>
               <strong>AliExpress AI Agent</strong>
-              <small>העוזר החכם שלך לקניות באלי אקספרס</small>
+              <small>העוזר החכם שלך לקניות</small>
             </span>
           </a>
 
           <nav class="navLinks" aria-label="קישורי עמוד">
-            <a class="active" href="#home"><span aria-hidden="true">⌂</span>בית</a>
-            <a href="#how"><span aria-hidden="true">◌</span>איך זה עובד</a>
-            <a href="#categories"><span aria-hidden="true">▦</span>קטגוריות</a>
-            <a href="#contact"><span aria-hidden="true">◍</span>צור קשר</a>
+            <a class="active" href="#home">בית</a>
+            <a href="#how">איך זה עובד</a>
+            <a href="#weekly">קטגוריות</a>
+            <a href="#footer">צור קשר</a>
           </nav>
 
           <a class="contactButton" href="#search">
-            <span aria-hidden="true">⌕</span>
             חפש עכשיו
           </a>
         </header>
@@ -63,24 +62,19 @@
           <button class="heroCta" type="button">לחפש עם הסוכן ↵</button>
         </section>
 
-        <section id="search" class="hero">
-          <div class="searchPanel">
+        <section id="search" class="searchAiSection" aria-label="חיפוש רגיל וקבלת AI">
+          <div class="searchColumn">
             <form id="searchForm" class="searchForm">
               <label for="query">מה אתה מחפש?</label>
               <div class="searchRow">
-                <input id="query" name="query" autocomplete="off" placeholder="לדוגמה: מטען מהיר לרכב USB-C" required>
-                <button type="submit">
-                  חפש עכשיו
-                  <span aria-hidden="true">⌕</span>
-                </button>
+                <input id="query" name="query" autocomplete="off" placeholder="מה אתה מחפש? למשל: אוזניות בלוטוס" required>
+                <button type="submit">חפש</button>
               </div>
               <div class="popularWrap">
-                <strong>חיפושים פופולריים:</strong>
                 <div class="exampleChips" aria-label="דוגמאות חיפוש">
-                  <button type="button" data-query="מטען לרכב"><span aria-hidden="true">▱</span>מטען לרכב</button>
-                  <button type="button" data-query="אוזניות בלוטוס"><span aria-hidden="true">◉</span>אוזניות בלוטוס</button>
-                  <button type="button" data-query="car charger"><span aria-hidden="true">⌕</span>car charger</button>
-                  <button type="button" data-query="שעון חכם"><span aria-hidden="true">◇</span>שעון חכם</button>
+                  <button type="button" data-query="מטען לרכב">מטען לרכב</button>
+                  <button type="button" data-query="אוזניות בלוטוס">אוזניות בלוטוס</button>
+                  <button type="button" data-query="שעון חכם">שעון חכם</button>
                 </div>
               </div>
             </form>
@@ -92,13 +86,13 @@
             </div>
           </div>
 
-          <aside class="receipt" aria-label="קבלת ה-AI">
+          <aside class="receipt" aria-label="קבלת AI">
             <div class="receiptTop">
-              <span>קבלת ה-AI · #1</span>
+              <span>המלצת ה-AI · #1</span>
               <strong>נבדק לפני 4 דקות</strong>
             </div>
             <div class="receiptProduct">
-              <div class="receiptThumb" aria-hidden="true">תמונה</div>
+              <img class="receiptThumb" src="/product-earbuds.svg" alt="אוזניות בלוטוס TWS ANC">
               <div>
                 <h2>אוזניות בלוטוס TWS ANC</h2>
                 <div class="receiptPrice">
@@ -111,11 +105,10 @@
 
             <div class="chartWrap">
               <svg viewBox="0 0 300 64" class="sparkline" preserveAspectRatio="none" aria-hidden="true">
-                <polyline points="0,20 30,24 60,18 90,30 120,26 150,40 180,34 210,48 240,42 270,52 300,50" fill="none" stroke="#e5ded0" stroke-width="2"></polyline>
                 <polyline points="0,20 30,24 60,18 90,30 120,26 150,40 180,34 210,48 240,42 270,52 300,50" fill="none" stroke="#D6491F" stroke-width="2.5"></polyline>
                 <circle cx="300" cy="50" r="4" fill="#D6491F"></circle>
               </svg>
-              <div class="chartLabels"><span>לפני 30 יום</span><span>המחיר הכי נמוך שנרשם</span></div>
+              <div class="chartLabels"><span>לפני 30 יום</span><span>מגמת מחיר</span></div>
             </div>
 
             <div class="reasons">
@@ -126,92 +119,33 @@
           </aside>
         </section>
 
-        <section id="how" class="infoSection">
-          <div class="sectionHeading">
-            <span>איך זה עובד</span>
-            <h2>במקום לפתוח עשרות מוצרים, נותנים ל-AI לעשות את הסינון.</h2>
-            <p>המערכת לוקחת את מה שהלקוח כתב, מתרגמת את הכוונה למילות חיפוש מדויקות, בודקת נתוני מוצר ומחזירה רק אפשרויות שעומדות בסינון.</p>
-          </div>
-          <div class="processGrid">
-            <article class="processCard">
-              <span>1</span>
-              <h3>מבינים את הבקשה</h3>
-              <p>הבוט מזהה אם מחפשים מוצר, אביזר, דגם, שימוש או קטגוריה.</p>
-            </article>
-            <article class="processCard">
-              <span>2</span>
-              <h3>סורקים כמה ניסוחים</h3>
-              <p>לא מסתפקים במילת חיפוש אחת. המערכת מנסה וריאציות כדי להגיע לתוצאות מדויקות יותר.</p>
-            </article>
-            <article class="processCard">
-              <span>3</span>
-              <h3>מסננים רעש</h3>
-              <p>מוצרים לא קשורים, אביזרים לא מתאימים וכותרות מטעות מקבלים ניקוד נמוך או נפסלים.</p>
-            </article>
-            <article class="processCard">
-              <span>4</span>
-              <h3>מציגים 3 חזקים</h3>
-              <p>הבחירה מתבססת על רלוונטיות, מחיר, דירוג, הזמנות וזמינות נתונים.</p>
-            </article>
-          </div>
-        </section>
-
-        <section id="categories" class="categorySection">
-          <div class="sectionHeading">
-            <span>קטגוריות</span>
-            <h2>חיפושים מהירים לפי תחום</h2>
-            <p>כל כרטיס כאן מפעיל חיפוש אמיתי בבוט. זה נותן ללקוח התחלה מהירה בלי לנחש מה לכתוב.</p>
-          </div>
-          <div class="categoryGrid" aria-label="קטגוריות חיפוש">
-            <button type="button" data-query="מטען לרכב USB-C">
-              <span>▱</span>
-              <strong>רכב וגאדג'טים</strong>
-              <small>מטענים, מחזיקים, מצלמות דרך ואביזרי רכב.</small>
-            </button>
-            <button type="button" data-query="אוזניות בלוטוס">
-              <span>◉</span>
-              <strong>אלקטרוניקה</strong>
-              <small>אוזניות, שעונים חכמים, כבלים, מצלמות ומטענים.</small>
-            </button>
-            <button type="button" data-query="מגן מסך לאייפון">
-              <span>◇</span>
-              <strong>טלפון ואביזרים</strong>
-              <small>כיסויים, מגני מסך, מתאמים וציוד טעינה.</small>
-            </button>
-            <button type="button" data-query="צעצוע לכלב">
-              <span>◌</span>
-              <strong>חיות מחמד</strong>
-              <small>צעצועים, מיטות, קערות ואביזרים לכלב ולחתול.</small>
-            </button>
-            <button type="button" data-query="ארנק לגבר">
-              <span>▦</span>
-              <strong>אופנה</strong>
-              <small>ארנקים, חגורות, תיקים, שעונים ואקססוריז.</small>
-            </button>
-            <button type="button" data-query="מנורת לילה">
-              <span>✧</span>
-              <strong>בית וחיים</strong>
-              <small>תאורה, ארגון, שטיחים, כריות ומוצרים לבית.</small>
-            </button>
-            <button type="button" data-query="פנס ראש">
-              <span>↗</span>
-              <strong>ספורט וטיולים</strong>
-              <small>ציוד קמפינג, פנסים, בקבוקים ואביזרי שטח.</small>
-            </button>
-            <button type="button" data-query="צעצוע לתינוק">
-              <span>☷</span>
-              <strong>תינוקות וילדים</strong>
-              <small>צעצועים, עגלות, מנשאים ומוצרים שימושיים להורים.</small>
-            </button>
-          </div>
-        </section>
+        <section id="results" class="results" aria-live="polite" aria-label="תוצאות חיפוש"></section>
 
         <section class="bigStatBanner" aria-label="סטטיסטיקת חיסכון">
-          <strong>$1,240,000+</strong>
-          <span>נחסכו למשתמשים שלנו החודש</span>
+          <strong>$1,240,000+ <span>נחסכו למשתמשים שלנו החודש</span></strong>
         </section>
 
-        <section class="weeklySection" aria-label="המומלצים של השבוע">
+        <section id="how" class="howSection" aria-label="איך זה עובד">
+          <div class="stepsGrid">
+            <article class="stepItem">
+              <span>01</span>
+              <h2>אתה מחפש כרגיל</h2>
+              <p>שולח לי מה אתה צריך, בלי לפתוח עשרה טאבים</p>
+            </article>
+            <article class="stepItem">
+              <span>02</span>
+              <h2>אני בודק ברקע</h2>
+              <p>משווה מחיר, היסטוריה, מוכר ודירוג באלפי מוצרים</p>
+            </article>
+            <article class="stepItem">
+              <span>03</span>
+              <h2>אתה מקבל את הדיל</h2>
+              <p>שלושה מוצרים בלבד, עם ההסבר למה הם שווים</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="weekly" class="weeklySection" aria-label="המומלצים של השבוע">
           <div class="weeklyHead">
             <h2>המומלצים של השבוע</h2>
             <span>מתעדכן כל שעה</span>
@@ -224,16 +158,16 @@
           <div class="weeklyList">
             <article class="weeklyItem">
               <span class="weeklyNum">01</span>
-              <div class="weeklyThumb">תמונה</div>
+              <img class="weeklyThumb" src="/product-earbuds.svg" alt="אוזניות בלוטוס TWS ANC">
               <div class="weeklyInfo">
-                <h3>אוזניות אלחוטיות לרכב</h3>
+                <h3>אוזניות בלוטוס TWS ANC</h3>
                 <p>דירוג 4.8 · 1,327 ביקורות · <b>98% שביעות רצון מהמוכר</b></p>
               </div>
               <div class="weeklyPrice"><b>42%-</b><strong>$12.45</strong><del>$21.49</del></div>
             </article>
             <article class="weeklyItem">
               <span class="weeklyNum">02</span>
-              <div class="weeklyThumb">תמונה</div>
+              <img class="weeklyThumb" src="/product-watch.svg" alt="שעון חכם ספורט">
               <div class="weeklyInfo">
                 <h3>שעון חכם ספורט</h3>
                 <p>דירוג 4.6 · 987 ביקורות · <b>50% הנחה, פעם ראשונה</b></p>
@@ -242,7 +176,7 @@
             </article>
             <article class="weeklyItem">
               <span class="weeklyNum">03</span>
-              <div class="weeklyThumb">תמונה</div>
+              <img class="weeklyThumb" src="/product-charger.svg" alt="מטען אלחוטי לרכב">
               <div class="weeklyInfo">
                 <h3>מטען אלחוטי לרכב</h3>
                 <p>דירוג 4.5 · 612 ביקורות · <b>מחיר יציב, לא צפוי לרדת</b></p>
@@ -258,47 +192,12 @@
           <span>— משתמשת קבועה, 3 חודשים בשימוש</span>
         </section>
 
-        <section id="features" class="features" aria-label="יתרונות המערכת">
-          <article class="featureCard">
-            <span class="featureIcon botIcon" aria-hidden="true">☷</span>
-            <h2>AI מתקדם</h2>
-            <p>הבנה חכמה של בקשת הלקוח וסריקה ממוקדת של מוצרים בשבילו.</p>
-          </article>
-          <article class="featureCard">
-            <span class="featureIcon tagIcon" aria-hidden="true">◇</span>
-            <h2>חיסכון מובטח</h2>
-            <p>אנחנו מציפים את האפשרויות המשתלמות ביותר לפי מחיר ונתונים.</p>
-          </article>
-          <article class="featureCard">
-            <span class="featureIcon shieldIcon" aria-hidden="true">◈</span>
-            <h2>מוצרים איכותיים</h2>
-            <p>רק מוצרים עם דירוג גבוה, תמונות ונתוני קנייה משמעותיים.</p>
-          </article>
-          <article class="featureCard">
-            <span class="featureIcon refreshIcon" aria-hidden="true">↻</span>
-            <h2>עדכונים יומיים</h2>
-            <p>תוצאות חדשות ורלוונטיות לפי המוצרים הזמינים כרגע.</p>
-          </article>
-        </section>
-
-        <section id="results" class="results" aria-live="polite" aria-label="תוצאות חיפוש"></section>
-
-        <section id="contact" class="contactSection">
-          <div>
-            <span>צור קשר</span>
-            <h2>רוצה שנוסיף קטגוריה או נדייק מוצר שחוזר לא נכון?</h2>
-            <p>המנוע נבנה להשתפר כל הזמן. כל חיפוש שלא פגע בול הופך אצלנו להזדמנות לחזק את המערכת.</p>
-          </div>
-          <a href="#search">בדוק מוצר עכשיו</a>
-        </section>
-
-        <footer class="footer">
-          <span>AliExpress AI Agent</span>
-          <span>עוזר קניות חכם, מהיר ומדויק יותר.</span>
+        <footer id="footer" class="footer">
+          <span>ALIEXPRESS AI AGENT — כלי עצמאי, לא קשור רשמית ל-ALIEXPRESS</span>
         </footer>
       </div>
     </main>
-    <script src="/app.js?v=home4"></script>
+    <script src="/app.js?v=home6"></script>
     <script src="/ai-agent-ui.js?v=3f"></script>
   </body>
 </html>
